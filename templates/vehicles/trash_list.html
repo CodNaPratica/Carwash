@@ -3,8 +3,10 @@
 {% block page_icon %}<div class="cw-topbar-icon"><i class="bi bi-trash"></i></div>{% endblock %}
 {% block page_title %}Lixo{% endblock %}
 {% block page_subtitle %}Registos apagados - só consulta e auditoria{% endblock %}
+{% block mobile_header %}{% include 'partials/mobile_page_header.html' with icon='bi-trash' title='Lixo' subtitle='Registos apagados - só consulta e auditoria' %}{% endblock %}
 {% block content %}
-<div class="cw-card p-2 p-md-3">
+{# ===== Desktop: table ===== #}
+<div class="cw-card p-2 p-md-3 d-none d-md-block">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
             <thead>
@@ -37,6 +39,41 @@
             </tbody>
         </table>
     </div>
+</div>
+
+{# ===== Mobile: stacked cards ===== #}
+<div class="d-md-none">
+    {% for entry in entries %}
+    <div class="cw-row-card">
+        <div class="cw-row-card-header">
+            <div>
+                <div class="cw-row-card-title">{{ entry.plate }}</div>
+                <div class="cw-row-card-subtitle">{{ entry.brand }} {{ entry.model }}</div>
+            </div>
+        </div>
+        <div class="cw-row-card-grid">
+            <div class="cw-row-card-field">
+                <div class="cw-row-card-label">Apagado por</div>
+                <div class="cw-row-card-value">{{ entry.trashed_by.username|default:'-' }}</div>
+            </div>
+            <div class="cw-row-card-field">
+                <div class="cw-row-card-label">Data</div>
+                <div class="cw-row-card-value">{{ entry.trashed_at|date:'d/m/Y H:i' }}</div>
+            </div>
+            <div class="cw-row-card-field" style="grid-column: span 2;">
+                <div class="cw-row-card-label">Motivo</div>
+                <div class="cw-row-card-value">{{ entry.trash_reason }}</div>
+            </div>
+        </div>
+        <div class="cw-row-card-actions">
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#detailModal{{ entry.pk }}">
+                <i class="bi bi-eye"></i> Ver detalhes
+            </button>
+        </div>
+    </div>
+    {% empty %}
+    <div class="cw-card p-4 text-center text-muted">Lixo vazio.</div>
+    {% endfor %}
 </div>
 
 {% for entry in entries %}

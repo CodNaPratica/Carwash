@@ -26,11 +26,9 @@
     </div>
 
     <div class="cw-main">
-        <header class="cw-topbar">
+        {# ===== Desktop topbar: per-page icon/title/subtitle ===== #}
+        <header class="cw-topbar d-none d-lg-flex">
             <div class="cw-topbar-header">
-                <button class="btn d-lg-none p-0 me-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#cwSidebarOffcanvas">
-                    <i class="bi bi-list fs-3" style="color: var(--cw-navy);"></i>
-                </button>
                 {% block page_icon %}<div class="cw-topbar-icon"><i class="bi bi-speedometer2"></i></div>{% endblock %}
                 <div class="min-w-0">
                     <p class="cw-topbar-title text-truncate">{% block page_title %}CarWash{% endblock %}</p>
@@ -38,29 +36,67 @@
                 </div>
             </div>
             <div class="cw-topbar-actions">
-                <i class="bi bi-bell d-none d-sm-inline" style="color: var(--cw-ink-secondary);"></i>
-                <span class="cw-online-pill d-none d-sm-inline-flex">Online</span>
+                <span class="cw-online-pill">Online</span>
+                <button type="button" class="cw-icon-btn" title="Notificações">
+                    <i class="bi bi-bell"></i>
+                </button>
+                <a href="{% url 'profile' %}" class="cw-icon-btn" title="Perfil e definições">
+                    <i class="bi bi-gear"></i>
+                </a>
                 <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
-                    <button class="btn btn-sm btn-outline-secondary" type="submit" title="Sair">
+                    <button class="cw-icon-btn" type="submit" title="Sair" style="background: transparent; color: var(--cw-ink-secondary); border: 1px solid #e5e7eb;">
                         <i class="bi bi-box-arrow-right"></i>
                     </button>
                 </form>
             </div>
         </header>
 
+        {# ===== Mobile topbar: brand + role portal, clean like the reference ===== #}
+        <div class="cw-mobile-topbar d-lg-none">
+            <div class="cw-mobile-topbar-brand">
+                <div class="cw-mobile-topbar-logo"><i class="bi bi-droplet-half"></i></div>
+                <div class="min-w-0">
+                    <div class="cw-mobile-topbar-name">CarWash</div>
+                    <div class="cw-mobile-topbar-tagline">
+                        {% if user.is_seguranca %}Portal do Segurança
+                        {% elif user.is_tesoureira %}Portal da Tesoureira
+                        {% elif user.is_admin_role %}Portal do Admin
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="cw-mobile-topbar-actions">
+                <button type="button" class="cw-icon-btn cw-icon-btn-ghost" title="Notificações">
+                    <i class="bi bi-bell"></i>
+                </button>
+                {% if user.is_admin_role %}
+                <button type="button" class="cw-icon-btn cw-icon-btn-ghost" data-bs-toggle="offcanvas" data-bs-target="#cwSidebarOffcanvas" title="Menu">
+                    <i class="bi bi-list"></i>
+                </button>
+                {% endif %}
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button class="cw-icon-btn cw-icon-btn-ghost" type="submit" title="Sair">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
         <main class="cw-content">
 {% else %}
-<div class="container">
+<div class="container-fluid p-0 p-lg-3">
 {% endif %}
             {% if messages %}
                 {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show mx-3 mx-lg-0" role="alert">
                     {{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
                 {% endfor %}
             {% endif %}
+            {% block mobile_header %}{% endblock %}
             {% block content %}{% endblock %}
 {% if user.is_authenticated %}
         </main>
@@ -70,20 +106,23 @@
 {% if not user.is_admin_role %}
 <nav class="cw-bottom-nav d-lg-none">
     {% if user.is_seguranca %}
-    <a class="cw-bottom-nav-link {% if request.resolver_match.app_name == 'vehicles' and request.resolver_match.url_name != 'trash_list' %}active{% endif %}" href="{% url 'vehicles:list' %}">
-        <i class="bi bi-car-front"></i> Carros
+    <a class="cw-bottom-nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'vehicles:home' %}">
+        <i class="bi bi-house-door-fill"></i> Início
+    </a>
+    <a class="cw-bottom-nav-link {% if request.resolver_match.app_name == 'vehicles' and request.resolver_match.url_name != 'home' and request.resolver_match.url_name != 'trash_list' %}active{% endif %}" href="{% url 'vehicles:list' %}">
+        <i class="bi bi-car-front"></i> Registros
     </a>
     {% endif %}
     {% if user.is_tesoureira %}
-    <a class="cw-bottom-nav-link {% if request.resolver_match.app_name == 'cashbox' %}active{% endif %}" href="{% url 'cashbox:dashboard' %}">
+    <a class="cw-bottom-nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'cashbox:home' %}">
+        <i class="bi bi-house-door-fill"></i> Início
+    </a>
+    <a class="cw-bottom-nav-link {% if request.resolver_match.app_name == 'cashbox' and request.resolver_match.url_name != 'home' %}active{% endif %}" href="{% url 'cashbox:dashboard' %}">
         <i class="bi bi-cash-coin"></i> Caixa
     </a>
     {% endif %}
     <a class="cw-bottom-nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}" href="{% url 'profile' %}">
         <i class="bi bi-person-circle"></i> Perfil
-    </a>
-    <a class="cw-bottom-nav-link" data-bs-toggle="offcanvas" data-bs-target="#cwSidebarOffcanvas" href="#" role="button">
-        <i class="bi bi-list"></i> Menu
     </a>
 </nav>
 {% endif %}

@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block title %}Início - CarWash{% endblock %}
+{% block page_icon %}<div class="cw-topbar-icon"><i class="bi bi-house-door"></i></div>{% endblock %}
+{% block page_title %}Início{% endblock %}
+{% block page_subtitle %}Registos de hoje{% endblock %}
+{% block mobile_header %}{% include 'partials/mobile_page_header.html' with icon='bi-house-door' title='Início' subtitle='Registos de hoje' %}{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h6 class="fw-bold mb-0" style="color: var(--cw-navy);">Pagamentos de hoje</h6>
+    <span class="badge bg-secondary">{{ payments.count }}</span>
+</div>
+{% if payments %}
+<div class="row g-3 mb-4">
+    {% for p in payments %}
+    <div class="col-12 col-md-6 col-lg-4">
+        <div class="cw-row-card mb-0 h-100">
+            <div class="cw-row-card-header">
+                <div>
+                    <div class="cw-row-card-title">{{ p.amount }}</div>
+                    <div class="cw-row-card-subtitle">{{ p.service }}</div>
+                </div>
+                <span class="text-muted small">{{ p.created_at|date:'H:i' }}</span>
+            </div>
+            <div class="cw-row-card-grid mb-0">
+                <div class="cw-row-card-field">
+                    <div class="cw-row-card-label">Carro</div>
+                    <div class="cw-row-card-value">{{ p.vehicle_entry|default:'-' }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="cw-card p-4 text-center text-muted mb-4">Ainda sem pagamentos hoje.</div>
+{% endif %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h6 class="fw-bold mb-0" style="color: var(--cw-navy);">Custos / Despesas de hoje</h6>
+    <span class="badge bg-secondary">{{ movements.count }}</span>
+</div>
+{% if movements %}
+<div class="row g-3 mb-4">
+    {% for m in movements %}
+    <div class="col-12 col-md-6 col-lg-4">
+        <div class="cw-row-card mb-0 h-100">
+            <div class="cw-row-card-header">
+                <div>
+                    <div class="cw-row-card-title">{{ m.amount }}</div>
+                    <div class="cw-row-card-subtitle">{{ m.get_category_display }} - {{ m.description }}</div>
+                </div>
+                <span class="text-muted small">{{ m.created_at|date:'H:i' }}</span>
+            </div>
+            <div class="cw-row-card-grid mb-0">
+                <div class="cw-row-card-field">
+                    <div class="cw-row-card-label">Comprovativo</div>
+                    <div class="cw-row-card-value"><a href="{{ m.proof.url }}" target="_blank">ver</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="cw-card p-4 text-center text-muted mb-4">Ainda sem custos/despesas hoje.</div>
+{% endif %}
+
+<div class="cw-quick-tiles-label">Ações rápidas</div>
+<div class="cw-quick-tiles" style="max-width: 420px;">
+    <a href="{% url 'cashbox:dashboard' %}?open=payment" class="cw-quick-tile">
+        <div class="cw-quick-tile-icon bg-good"><i class="bi bi-cash-coin"></i></div>
+        <div class="cw-quick-tile-label">Pagamento</div>
+    </a>
+    <a href="{% url 'cashbox:dashboard' %}?open=movement" class="cw-quick-tile">
+        <div class="cw-quick-tile-icon bg-orange"><i class="bi bi-receipt"></i></div>
+        <div class="cw-quick-tile-label">Custo/Despesa</div>
+    </a>
+    <a href="{% url 'profile' %}" class="cw-quick-tile">
+        <div class="cw-quick-tile-icon bg-navy"><i class="bi bi-person-circle"></i></div>
+        <div class="cw-quick-tile-label">Perfil</div>
+    </a>
+</div>
+
+<div class="row g-3 mt-1">
+    <div class="col-4">
+        <div class="cw-finance-box">
+            <div class="cw-stat-icon bg-good" style="width:36px;height:36px;font-size:1rem;"><i class="bi bi-arrow-down-left"></i></div>
+            <div><div class="cw-finance-value">{{ total_in }}</div><div class="cw-finance-label">Recebido</div></div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="cw-finance-box">
+            <div class="cw-stat-icon bg-muted" style="width:36px;height:36px;font-size:1rem;"><i class="bi bi-arrow-up-right"></i></div>
+            <div><div class="cw-finance-value">{{ total_out }}</div><div class="cw-finance-label">Saídas</div></div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="cw-finance-box">
+            <div class="cw-stat-icon bg-navy" style="width:36px;height:36px;font-size:1rem;"><i class="bi bi-wallet2"></i></div>
+            <div><div class="cw-finance-value">{{ balance }}</div><div class="cw-finance-label">Saldo</div></div>
+        </div>
+    </div>
+</div>
+{% endblock %}

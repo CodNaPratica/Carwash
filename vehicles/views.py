@@ -18,6 +18,7 @@ def _list_context(**overrides):
     context = {
         'entries': entries,
         'rows': rows,
+        'pending_count': entries.filter(status=VehicleEntry.Status.PENDENTE).count(),
         'create_form': VehicleEntryForm(),
         'open_create': False,
         'open_edit_pk': None,
@@ -28,8 +29,18 @@ def _list_context(**overrides):
 
 
 @role_required('seguranca')
+def vehicle_home(request):
+    today_entries = VehicleEntry.objects.filter(is_trashed=False, created_at__date=timezone.localdate())
+    return render(request, 'vehicles/home.html', {
+        'today_entries': today_entries,
+        'today_count': today_entries.count(),
+    })
+
+
+@role_required('seguranca')
 def vehicle_list(request):
-    return render(request, 'vehicles/list.html', _list_context())
+    open_create = request.GET.get('open') == 'create'
+    return render(request, 'vehicles/list.html', _list_context(open_create=open_create))
 
 
 @role_required('seguranca')

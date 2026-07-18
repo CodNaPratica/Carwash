@@ -19,9 +19,9 @@ def dashboard(request):
     if user.is_admin_role():
         return redirect('admin_dashboard')
     if user.is_seguranca():
-        return redirect('vehicles:list')
+        return redirect('vehicles:home')
     if user.is_tesoureira():
-        return redirect('cashbox:dashboard')
+        return redirect('cashbox:home')
     return redirect('login')
 
 

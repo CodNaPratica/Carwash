@@ -3,13 +3,15 @@
 {% block page_icon %}<div class="cw-topbar-icon"><i class="bi bi-bar-chart-line"></i></div>{% endblock %}
 {% block page_title %}Fechamentos{% endblock %}
 {% block page_subtitle %}Histórico de fechamentos diários, semanais e mensais{% endblock %}
+{% block mobile_header %}{% include 'partials/mobile_page_header.html' with icon='bi-bar-chart-line' title='Fechamentos' subtitle='Histórico de fechamentos' %}{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-end mb-3">
     <button type="button" class="btn btn-cw-orange" data-bs-toggle="modal" data-bs-target="#periodClosureModal">
         <i class="bi bi-plus-circle me-1"></i> Novo fecho semanal/mensal
     </button>
 </div>
-<div class="cw-card p-2 p-md-3">
+{# ===== Desktop: table ===== #}
+<div class="cw-card p-2 p-md-3 d-none d-md-block">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
             <thead>
@@ -37,6 +39,30 @@
             </tbody>
         </table>
     </div>
+</div>
+
+{# ===== Mobile: stacked cards ===== #}
+<div class="d-md-none">
+    {% for c in closures %}
+    <div class="cw-row-card">
+        <div class="cw-row-card-header">
+            <div>
+                <div class="cw-row-card-title">{{ c.get_period_type_display }}</div>
+                <div class="cw-row-card-subtitle">{{ c.date_start|date:'d/m/Y' }} a {{ c.date_end|date:'d/m/Y' }}</div>
+            </div>
+        </div>
+        <div class="cw-row-card-grid">
+            <div class="cw-row-card-field"><div class="cw-row-card-label">Entradas</div><div class="cw-row-card-value">{{ c.total_in }}</div></div>
+            <div class="cw-row-card-field"><div class="cw-row-card-label">Saídas</div><div class="cw-row-card-value">{{ c.total_out }}</div></div>
+            <div class="cw-row-card-field"><div class="cw-row-card-label">Saldo</div><div class="cw-row-card-value">{{ c.balance }}</div></div>
+            <div class="cw-row-card-field"><div class="cw-row-card-label">Fundo de caixa</div><div class="cw-row-card-value">{{ c.carried_forward }}</div></div>
+            <div class="cw-row-card-field"><div class="cw-row-card-label">Fechado por</div><div class="cw-row-card-value">{{ c.closed_by.username }}</div></div>
+            <div class="cw-row-card-field"><div class="cw-row-card-label">Data fecho</div><div class="cw-row-card-value">{{ c.closed_at|date:'d/m/Y H:i' }}</div></div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="cw-card p-4 text-center text-muted">Sem fechamentos ainda.</div>
+    {% endfor %}
 </div>
 
 {# ===== Period closure modal ===== #}

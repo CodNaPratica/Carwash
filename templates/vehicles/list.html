@@ -3,13 +3,16 @@
 {% block page_icon %}<div class="cw-topbar-icon"><i class="bi bi-car-front"></i></div>{% endblock %}
 {% block page_title %}Carros{% endblock %}
 {% block page_subtitle %}Registo, adoção e acompanhamento dos carros a lavar{% endblock %}
+{% block mobile_header %}{% include 'partials/mobile_page_header.html' with icon='bi-car-front' title='Carros' subtitle='Registo e acompanhamento' %}{% endblock %}
 {% block content %}
+
 <div class="d-flex justify-content-end mb-3">
     <button type="button" class="btn btn-cw-orange" data-bs-toggle="modal" data-bs-target="#createVehicleModal">
         <i class="bi bi-plus-circle me-1"></i> Registar carro
     </button>
 </div>
-<div class="cw-card p-2 p-md-3">
+{# ===== Desktop: table ===== #}
+<div class="cw-card p-2 p-md-3 d-none d-md-block">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
             <thead>
@@ -46,6 +49,50 @@
             </tbody>
         </table>
     </div>
+</div>
+
+{# ===== Mobile: stacked cards ===== #}
+<div class="d-md-none">
+    {% for entry, edit_form, trash_form in rows %}
+    <div class="cw-row-card">
+        <div class="cw-row-card-header">
+            <div>
+                <div class="cw-row-card-title">{{ entry.plate }}</div>
+                <div class="cw-row-card-subtitle">{{ entry.brand }} {{ entry.model }}</div>
+            </div>
+            <span class="badge bg-secondary">{{ entry.get_status_display }}</span>
+        </div>
+        <div class="cw-row-card-grid">
+            <div class="cw-row-card-field">
+                <div class="cw-row-card-label">Serviço</div>
+                <div class="cw-row-card-value">{{ entry.service|default:'-' }}</div>
+            </div>
+            <div class="cw-row-card-field">
+                <div class="cw-row-card-label">Registado por</div>
+                <div class="cw-row-card-value">{{ entry.registered_by.username }}</div>
+            </div>
+            <div class="cw-row-card-field">
+                <div class="cw-row-card-label">Adotado por</div>
+                <div class="cw-row-card-value">{{ entry.claimed_by.username|default:'-' }}</div>
+            </div>
+        </div>
+        <div class="cw-row-card-actions">
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editModal{{ entry.pk }}">
+                <i class="bi bi-pencil"></i> Editar
+            </button>
+            {% if entry.status == 'pendente' %}
+            <a href="{% url 'vehicles:adopt' entry.pk %}" class="btn btn-sm btn-outline-success">
+                <i class="bi bi-check2"></i> Adotar
+            </a>
+            {% endif %}
+            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#trashModal{{ entry.pk }}">
+                <i class="bi bi-trash"></i> Apagar
+            </button>
+        </div>
+    </div>
+    {% empty %}
+    <div class="cw-card p-4 text-center text-muted">Sem registos.</div>
+    {% endfor %}
 </div>
 
 {# ===== Create modal ===== #}

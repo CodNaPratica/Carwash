@@ -5,6 +5,7 @@ from . import views
 app_name = 'cashbox'
 
 urlpatterns = [
+    path('inicio/', views.home, name='home'),
     path('', views.dashboard, name='dashboard'),
     path('pagamento/novo/', views.payment_create, name='payment_create'),
     path('movimento/novo/', views.movement_create, name='movement_create'),

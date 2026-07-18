@@ -4,7 +4,52 @@
 {% block page_title %}Perfil{% endblock %}
 {% block page_subtitle %}Os seus dados e acesso ao sistema{% endblock %}
 {% block content %}
-<div class="row g-4">
+
+{# ===== Mobile: app-style profile (hero + collapsible settings list) ===== #}
+<div class="d-lg-none">
+    <div class="cw-profile-hero">
+        <div class="cw-profile-hero-avatar">{{ user.username|slice:':1'|upper }}</div>
+        <div class="min-w-0">
+            <div class="cw-profile-hero-name text-truncate">{{ user.get_full_name|default:user.username }}</div>
+            <div class="cw-profile-hero-handle">@{{ user.username }}</div>
+            <span class="cw-profile-hero-badge"><i class="bi bi-shield-fill"></i> {{ user.get_role_display }}</span>
+        </div>
+    </div>
+
+    <div class="cw-quick-tiles-label">Conta &amp; Definições</div>
+    <div class="cw-settings-list">
+        <a class="cw-settings-row" data-bs-toggle="collapse" href="#mobileProfileData" role="button" aria-expanded="false">
+            <div class="cw-settings-icon bg-navy-soft"><i class="bi bi-person"></i></div>
+            <div class="flex-grow-1">
+                <div class="cw-settings-title">Meu Perfil</div>
+                <div class="cw-settings-subtitle">Ver e editar dados pessoais</div>
+            </div>
+            <i class="bi bi-chevron-down cw-settings-chevron"></i>
+        </a>
+        <div class="collapse" id="mobileProfileData">
+            <div class="cw-settings-panel">
+                {% include 'accounts/_profile_data_form.html' %}
+            </div>
+        </div>
+
+        <a class="cw-settings-row" data-bs-toggle="collapse" href="#mobileProfilePassword" role="button" aria-expanded="false">
+            <div class="cw-settings-icon bg-orange-soft"><i class="bi bi-shield-lock"></i></div>
+            <div class="flex-grow-1">
+                <div class="cw-settings-title">Segurança</div>
+                <div class="cw-settings-subtitle">Alterar palavra-passe da conta</div>
+            </div>
+            <i class="bi bi-chevron-down cw-settings-chevron"></i>
+        </a>
+        <div class="collapse" id="mobileProfilePassword">
+            <div class="cw-settings-panel">
+                {% include 'accounts/_profile_password_form.html' %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ===== Desktop: two cards side by side ===== #}
+<div class="row g-4 d-none d-lg-flex">
     <div class="col-lg-6">
         <div class="cw-card p-4">
             <div class="d-flex align-items-center gap-2 mb-3">
@@ -21,12 +66,7 @@
                     <div class="fw-semibold">{{ user.get_role_display }}</div>
                 </div>
             </div>
-            <form method="post">
-                {% csrf_token %}
-                <input type="hidden" name="form_type" value="profile">
-                {% include 'partials/form_fields.html' with form=profile_form %}
-                <button type="submit" class="btn btn-cw-orange">Guardar dados</button>
-            </form>
+            {% include 'accounts/_profile_data_form.html' %}
         </div>
     </div>
 
@@ -36,12 +76,7 @@
                 <div class="cw-section-icon bg-orange"><i class="bi bi-key"></i></div>
                 <h6 class="mb-0 fw-bold">Alterar palavra-passe</h6>
             </div>
-            <form method="post">
-                {% csrf_token %}
-                <input type="hidden" name="form_type" value="password">
-                {% include 'partials/form_fields.html' with form=password_form %}
-                <button type="submit" class="btn btn-cw-orange">Alterar palavra-passe</button>
-            </form>
+            {% include 'accounts/_profile_password_form.html' %}
         </div>
     </div>
 </div>

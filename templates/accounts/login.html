@@ -1,7 +1,51 @@
 {% extends 'base.html' %}
 {% block title %}Login - CarWash{% endblock %}
 {% block content %}
-<div class="cw-login-wrapper">
+
+{# ===== Mobile: gradient hero + rounded bottom sheet ===== #}
+<div class="cw-login-mobile d-lg-none">
+    <div class="cw-login-mobile-hero">
+        <div class="cw-login-mobile-logo"><i class="bi bi-droplet-half"></i></div>
+        <div class="cw-login-mobile-name">CarWash</div>
+        <div class="cw-login-mobile-tagline">GESTÃO INTELIGENTE</div>
+        <div class="cw-login-mobile-sub">Sistema completo para a sua lavagem de automóveis</div>
+    </div>
+    <div class="cw-login-mobile-sheet">
+        <div class="cw-login-mobile-handle"></div>
+        <h3 class="fw-bold" style="color: var(--cw-navy);">Bem-vindo de volta</h3>
+        <p class="text-muted mb-4">Entre com as suas credenciais</p>
+
+        {% if form.errors %}
+        <div class="alert alert-danger">Utilizador ou palavra-passe inválidos.</div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Nome de utilizador</label>
+                <div class="input-group cw-input-group-soft">
+                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                    {{ form.username }}
+                </div>
+            </div>
+            <div class="mb-2">
+                <label class="form-label fw-semibold">Palavra-passe</label>
+                <div class="input-group cw-input-group-soft">
+                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                    {{ form.password }}
+                </div>
+            </div>
+            <button type="submit" class="btn btn-cw-orange w-100 mt-3">
+                Entrar <i class="bi bi-arrow-right ms-1"></i>
+            </button>
+        </form>
+
+        <p class="text-center text-muted small mt-4 mb-0">Sistema exclusivo para a equipa CarWash</p>
+    </div>
+</div>
+
+{# ===== Desktop: split card ===== #}
+<div class="cw-login-wrapper d-none d-lg-flex">
     <div class="card cw-login-card border-0">
         <div class="row g-0">
             <div class="col-md-5 cw-login-side">

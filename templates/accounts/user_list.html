@@ -3,13 +3,15 @@
 {% block page_icon %}<div class="cw-topbar-icon"><i class="bi bi-people"></i></div>{% endblock %}
 {% block page_title %}Usuários{% endblock %}
 {% block page_subtitle %}Gestão de contas e perfis de acesso{% endblock %}
+{% block mobile_header %}{% include 'partials/mobile_page_header.html' with icon='bi-people' title='Usuários' subtitle='Gestão de contas e acessos' %}{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-end mb-3">
     <button type="button" class="btn btn-cw-orange" data-bs-toggle="modal" data-bs-target="#createUserModal">
         <i class="bi bi-plus-circle me-1"></i> Novo utilizador
     </button>
 </div>
-<div class="cw-card p-2 p-md-3">
+{# ===== Desktop: table ===== #}
+<div class="cw-card p-2 p-md-3 d-none d-md-block">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
             <thead>
@@ -43,6 +45,34 @@
             </tbody>
         </table>
     </div>
+</div>
+
+{# ===== Mobile: stacked cards ===== #}
+<div class="d-md-none">
+    {% for u, edit_form, pw_form in rows %}
+    <div class="cw-row-card">
+        <div class="cw-row-card-header">
+            <div>
+                <div class="cw-row-card-title">{{ u.username }}</div>
+                <div class="cw-row-card-subtitle">{{ u.get_full_name|default:'-' }}</div>
+            </div>
+            {% if u.is_active %}<span class="badge bg-success">Ativo</span>{% else %}<span class="badge bg-danger">Inativo</span>{% endif %}
+        </div>
+        <div class="cw-row-card-grid">
+            <div class="cw-row-card-field"><div class="cw-row-card-label">Perfil</div><div class="cw-row-card-value">{{ u.get_role_display }}</div></div>
+        </div>
+        <div class="cw-row-card-actions">
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editUserModal{{ u.pk }}">
+                <i class="bi bi-pencil"></i> Editar
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#passwordModal{{ u.pk }}">
+                <i class="bi bi-key"></i> Password
+            </button>
+        </div>
+    </div>
+    {% empty %}
+    <div class="cw-card p-4 text-center text-muted">Nenhum utilizador.</div>
+    {% endfor %}
 </div>
 
 {# ===== Create modal ===== #}

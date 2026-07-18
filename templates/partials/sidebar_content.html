@@ -21,13 +21,21 @@
        href="{% url 'admin_dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
     {% endif %}
 
+    {% if user.is_seguranca %}
+    <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+       href="{% url 'vehicles:home' %}"><i class="bi bi-house-door"></i> Início</a>
+    {% endif %}
     {% if user.is_seguranca or user.is_admin_role %}
-    <a class="nav-link {% if request.resolver_match.app_name == 'vehicles' and request.resolver_match.url_name != 'trash_list' %}active{% endif %}"
-       href="{% url 'vehicles:list' %}"><i class="bi bi-car-front"></i> Carros</a>
+    <a class="nav-link {% if request.resolver_match.app_name == 'vehicles' and request.resolver_match.url_name != 'trash_list' and request.resolver_match.url_name != 'home' %}active{% endif %}"
+       href="{% url 'vehicles:list' %}"><i class="bi bi-car-front"></i> {% if user.is_seguranca %}Registros{% else %}Carros{% endif %}</a>
     {% endif %}
 
+    {% if user.is_tesoureira %}
+    <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
+       href="{% url 'cashbox:home' %}"><i class="bi bi-house-door"></i> Início</a>
+    {% endif %}
     {% if user.is_tesoureira or user.is_admin_role %}
-    <a class="nav-link {% if request.resolver_match.app_name == 'cashbox' and request.resolver_match.url_name != 'closures' and request.resolver_match.url_name != 'period_closure_create' %}active{% endif %}"
+    <a class="nav-link {% if request.resolver_match.app_name == 'cashbox' and request.resolver_match.url_name != 'closures' and request.resolver_match.url_name != 'period_closure_create' and request.resolver_match.url_name != 'home' %}active{% endif %}"
        href="{% url 'cashbox:dashboard' %}"><i class="bi bi-cash-coin"></i> Caixa</a>
     {% endif %}
 

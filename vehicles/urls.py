@@ -5,6 +5,7 @@ from . import views
 app_name = 'vehicles'
 
 urlpatterns = [
+    path('inicio/', views.vehicle_home, name='home'),
     path('', views.vehicle_list, name='list'),
     path('novo/', views.vehicle_create, name='create'),
     path('<int:pk>/editar/', views.vehicle_edit, name='edit'),

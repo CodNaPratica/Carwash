@@ -3,6 +3,7 @@
 {% block page_icon %}<div class="cw-topbar-icon"><i class="bi bi-cash-coin"></i></div>{% endblock %}
 {% block page_title %}Caixa{% endblock %}
 {% block page_subtitle %}{{ today|date:'d/m/Y' }}{% endblock %}
+{% block mobile_header %}{% include 'partials/mobile_page_header.html' with icon='bi-cash-coin' title='Caixa' subtitle=today|date:'d/m/Y' %}{% endblock %}
 {% block content %}
 
 {% if unclosed_day %}
@@ -12,6 +13,110 @@
 </div>
 {% endif %}
 
+<div class="mb-4 d-flex flex-wrap gap-2">
+    <button type="button" class="btn btn-cw-orange" data-bs-toggle="modal" data-bs-target="#paymentModal">
+        <i class="bi bi-plus-circle me-1"></i> Registar pagamento
+    </button>
+    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#movementModal">
+        <i class="bi bi-receipt me-1"></i> Registar custo/despesa
+    </button>
+    {% if not today_closed %}
+    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#todayCloseModal">
+        <i class="bi bi-lock me-1"></i> Fechar caixa de hoje
+    </button>
+    {% else %}
+    <span class="badge bg-secondary align-self-center">Caixa de hoje já fechado</span>
+    {% endif %}
+</div>
+
+<h6 class="fw-semibold px-1 mb-2">Pagamentos de hoje</h6>
+<div class="cw-card p-2 p-md-3 mb-4 d-none d-md-block">
+    <div class="table-responsive">
+        <table class="table table-sm table-hover align-middle mb-0">
+            <thead><tr><th>Carro</th><th>Serviço</th><th>Valor</th><th>Recebido por</th><th>Hora</th></tr></thead>
+            <tbody>
+                {% for p in payments %}
+                <tr>
+                    <td>{{ p.vehicle_entry|default:'-' }}</td>
+                    <td>{{ p.service }}</td>
+                    <td>{{ p.amount }}</td>
+                    <td>{{ p.received_by.username }}</td>
+                    <td>{{ p.created_at|date:'H:i' }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="text-center text-muted py-4">Sem pagamentos hoje.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="d-md-none mb-4">
+    {% for p in payments %}
+    <div class="cw-row-card">
+        <div class="cw-row-card-header">
+            <div>
+                <div class="cw-row-card-title">{{ p.amount }}</div>
+                <div class="cw-row-card-subtitle">{{ p.service }}</div>
+            </div>
+            <span class="text-muted small">{{ p.created_at|date:'H:i' }}</span>
+        </div>
+        <div class="cw-row-card-grid">
+            <div class="cw-row-card-field" style="grid-column: span 2;">
+                <div class="cw-row-card-label">Carro</div>
+                <div class="cw-row-card-value">{{ p.vehicle_entry|default:'-' }}</div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="cw-card p-4 text-center text-muted">Sem pagamentos hoje.</div>
+    {% endfor %}
+</div>
+
+<h6 class="fw-semibold px-1 mb-2">Custos / Despesas de hoje</h6>
+<div class="cw-card p-2 p-md-3 d-none d-md-block">
+    <div class="table-responsive">
+        <table class="table table-sm table-hover align-middle mb-0">
+            <thead><tr><th>Categoria</th><th>Descrição</th><th>Valor</th><th>Comprovativo</th><th>Registado por</th><th>Hora</th></tr></thead>
+            <tbody>
+                {% for m in movements %}
+                <tr>
+                    <td>{{ m.get_category_display }}</td>
+                    <td>{{ m.description }}</td>
+                    <td>{{ m.amount }}</td>
+                    <td><a href="{{ m.proof.url }}" target="_blank">ver</a></td>
+                    <td>{{ m.registered_by.username }}</td>
+                    <td>{{ m.created_at|date:'H:i' }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center text-muted py-4">Sem movimentos hoje.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="d-md-none">
+    {% for m in movements %}
+    <div class="cw-row-card">
+        <div class="cw-row-card-header">
+            <div>
+                <div class="cw-row-card-title">{{ m.amount }}</div>
+                <div class="cw-row-card-subtitle">{{ m.get_category_display }} - {{ m.description }}</div>
+            </div>
+            <span class="text-muted small">{{ m.created_at|date:'H:i' }}</span>
+        </div>
+        <div class="cw-row-card-grid">
+            <div class="cw-row-card-field" style="grid-column: span 2;">
+                <div class="cw-row-card-label">Comprovativo</div>
+                <div class="cw-row-card-value"><a href="{{ m.proof.url }}" target="_blank">ver</a></div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="cw-card p-4 text-center text-muted">Sem movimentos hoje.</div>
+    {% endfor %}
+</div>
+
+<h6 class="fw-semibold px-1 mb-2 mt-4">Resumo do dia</h6>
 <div class="row g-3 mb-4">
     <div class="col-md-4">
         <div class="cw-stat-tile">
@@ -39,67 +144,6 @@
                 <div class="cw-stat-label">Saldo do dia</div>
             </div>
         </div>
-    </div>
-</div>
-
-<div class="mb-4 d-flex flex-wrap gap-2">
-    <button type="button" class="btn btn-cw-orange" data-bs-toggle="modal" data-bs-target="#paymentModal">
-        <i class="bi bi-plus-circle me-1"></i> Registar pagamento
-    </button>
-    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#movementModal">
-        <i class="bi bi-receipt me-1"></i> Registar custo/despesa
-    </button>
-    {% if not today_closed %}
-    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#todayCloseModal">
-        <i class="bi bi-lock me-1"></i> Fechar caixa de hoje
-    </button>
-    {% else %}
-    <span class="badge bg-secondary align-self-center">Caixa de hoje já fechado</span>
-    {% endif %}
-</div>
-
-<div class="cw-card p-2 p-md-3 mb-4">
-    <h6 class="fw-semibold px-2 pt-2">Pagamentos de hoje</h6>
-    <div class="table-responsive">
-        <table class="table table-sm table-hover align-middle mb-0">
-            <thead><tr><th>Carro</th><th>Serviço</th><th>Valor</th><th>Recebido por</th><th>Hora</th></tr></thead>
-            <tbody>
-                {% for p in payments %}
-                <tr>
-                    <td>{{ p.vehicle_entry|default:'-' }}</td>
-                    <td>{{ p.service }}</td>
-                    <td>{{ p.amount }}</td>
-                    <td>{{ p.received_by.username }}</td>
-                    <td>{{ p.created_at|date:'H:i' }}</td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="5" class="text-center text-muted py-4">Sem pagamentos hoje.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<div class="cw-card p-2 p-md-3">
-    <h6 class="fw-semibold px-2 pt-2">Custos / Despesas de hoje</h6>
-    <div class="table-responsive">
-        <table class="table table-sm table-hover align-middle mb-0">
-            <thead><tr><th>Categoria</th><th>Descrição</th><th>Valor</th><th>Comprovativo</th><th>Registado por</th><th>Hora</th></tr></thead>
-            <tbody>
-                {% for m in movements %}
-                <tr>
-                    <td>{{ m.get_category_display }}</td>
-                    <td>{{ m.description }}</td>
-                    <td>{{ m.amount }}</td>
-                    <td><a href="{{ m.proof.url }}" target="_blank">ver</a></td>
-                    <td>{{ m.registered_by.username }}</td>
-                    <td>{{ m.created_at|date:'H:i' }}</td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="6" class="text-center text-muted py-4">Sem movimentos hoje.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
     </div>
 </div>
 

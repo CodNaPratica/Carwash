@@ -43,8 +43,27 @@ def _dashboard_context(**overrides):
 
 
 @role_required('tesoureira')
+def home(request):
+    today = timezone.localdate()
+    total_in, total_out = totals_for_range(today, today)
+    return render(request, 'cashbox/home.html', {
+        'total_in': total_in,
+        'total_out': total_out,
+        'balance': total_in - total_out,
+        'payments': Payment.objects.filter(created_at__date=today),
+        'movements': CashMovement.objects.filter(created_at__date=today),
+    })
+
+
+@role_required('tesoureira')
 def dashboard(request):
-    return render(request, 'cashbox/dashboard.html', _dashboard_context())
+    open_param = request.GET.get('open')
+    overrides = {}
+    if open_param == 'payment':
+        overrides['open_payment_modal'] = True
+    elif open_param == 'movement':
+        overrides['open_movement_modal'] = True
+    return render(request, 'cashbox/dashboard.html', _dashboard_context(**overrides))
 
 
 @role_required('tesoureira')
