@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Perfil - CarWash{% endblock %}
+{% block page_icon %}<div class="cw-topbar-icon"><i class="bi bi-person-circle"></i></div>{% endblock %}
+{% block page_title %}Perfil{% endblock %}
+{% block page_subtitle %}Os seus dados e acesso ao sistema{% endblock %}
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="cw-card p-4">
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <div class="cw-section-icon bg-navy"><i class="bi bi-person"></i></div>
+                <h6 class="mb-0 fw-bold">Os meus dados</h6>
+            </div>
+            <div class="row g-3 mb-3">
+                <div class="col-6">
+                    <div class="cw-finance-label">Utilizador</div>
+                    <div class="fw-semibold">{{ user.username }}</div>
+                </div>
+                <div class="col-6">
+                    <div class="cw-finance-label">Perfil</div>
+                    <div class="fw-semibold">{{ user.get_role_display }}</div>
+                </div>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="profile">
+                {% include 'partials/form_fields.html' with form=profile_form %}
+                <button type="submit" class="btn btn-cw-orange">Guardar dados</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="cw-card p-4">
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <div class="cw-section-icon bg-orange"><i class="bi bi-key"></i></div>
+                <h6 class="mb-0 fw-bold">Alterar palavra-passe</h6>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="password">
+                {% include 'partials/form_fields.html' with form=password_form %}
+                <button type="submit" class="btn btn-cw-orange">Alterar palavra-passe</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

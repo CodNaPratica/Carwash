@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block title %}Lixo - CarWash{% endblock %}
+{% block page_icon %}<div class="cw-topbar-icon"><i class="bi bi-trash"></i></div>{% endblock %}
+{% block page_title %}Lixo{% endblock %}
+{% block page_subtitle %}Registos apagados - só consulta e auditoria{% endblock %}
+{% block content %}
+<div class="cw-card p-2 p-md-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Matrícula</th>
+                    <th>Marca / Modelo</th>
+                    <th>Apagado por</th>
+                    <th>Data</th>
+                    <th>Motivo</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in entries %}
+                <tr>
+                    <td>{{ entry.plate }}</td>
+                    <td>{{ entry.brand }} {{ entry.model }}</td>
+                    <td>{{ entry.trashed_by.username|default:'-' }}</td>
+                    <td>{{ entry.trashed_at|date:'d/m/Y H:i' }}</td>
+                    <td>{{ entry.trash_reason }}</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#detailModal{{ entry.pk }}">
+                            <i class="bi bi-eye"></i> Ver detalhes
+                        </button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center text-muted py-4">Lixo vazio.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% for entry in entries %}
+<div class="modal fade" id="detailModal{{ entry.pk }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down modal-lg">
+        <div class="modal-content cw-form-modal">
+            <div class="row g-0">
+                <div class="col-lg-4 cw-form-side">
+                    <div class="cw-form-side-icon"><i class="bi bi-trash-fill"></i></div>
+                    <div class="cw-form-side-title">Auditoria</div>
+                    <div class="cw-form-side-subtitle">{{ entry.plate }}</div>
+                    {% if entry.photo %}
+                    <div class="cw-form-step p-2">
+                        <img src="{{ entry.photo.url }}" alt="Foto do carro" class="img-fluid rounded" style="max-height: 160px; object-fit: cover; width: 100%;">
+                    </div>
+                    {% endif %}
+                    <div class="cw-form-tip">
+                        <div class="cw-form-tip-title"><i class="bi bi-stars"></i> MOTIVO DA REMOÇÃO</div>
+                        <p>{{ entry.trash_reason|default:'Sem motivo indicado.' }}</p>
+                    </div>
+                </div>
+                <div class="col-lg-8 cw-form-main">
+                    <button type="button" class="cw-form-close" data-bs-dismiss="modal" aria-label="Fechar"><i class="bi bi-x-lg"></i></button>
+                    <div class="cw-form-breadcrumb">Lixo <i class="bi bi-chevron-right"></i> <span>DETALHES</span></div>
+                    <h4 class="cw-form-title">{{ entry.brand }} {{ entry.model }} ({{ entry.plate }})</h4>
+
+                    <div class="cw-form-section-header">
+                        <div class="cw-form-section-icon"><i class="bi bi-info-circle"></i></div>
+                        <span>Dados do registo</span>
+                    </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-6"><div class="cw-finance-label">Serviço</div><div class="fw-semibold">{{ entry.service|default:'-' }}</div></div>
+                        <div class="col-6"><div class="cw-finance-label">Estado antes de apagar</div><div class="fw-semibold">{{ entry.get_status_display }}</div></div>
+                        <div class="col-6"><div class="cw-finance-label">Registado por</div><div class="fw-semibold">{{ entry.registered_by.username }} em {{ entry.created_at|date:'d/m/Y H:i' }}</div></div>
+                        <div class="col-6"><div class="cw-finance-label">Adotado por</div><div class="fw-semibold">{{ entry.claimed_by.username|default:'-' }}{% if entry.claimed_at %} em {{ entry.claimed_at|date:'d/m/Y H:i' }}{% endif %}</div></div>
+                        <div class="col-6"><div class="cw-finance-label">Apagado por</div><div class="fw-semibold">{{ entry.trashed_by.username|default:'-' }}</div></div>
+                        <div class="col-6"><div class="cw-finance-label">Apagado em</div><div class="fw-semibold">{{ entry.trashed_at|date:'d/m/Y H:i' }}</div></div>
+                    </div>
+
+                    <div class="cw-form-section-header">
+                        <div class="cw-form-section-icon"><i class="bi bi-clock-history"></i></div>
+                        <span>Histórico de edições</span>
+                    </div>
+                    {% for log in entry.logs.all %}
+                    <div class="cw-finance-box mb-2" style="align-items: flex-start;">
+                        <div class="cw-stat-icon bg-navy" style="width:32px;height:32px;font-size:.9rem;"><i class="bi bi-pencil"></i></div>
+                        <div>
+                            <div class="fw-semibold small">{{ log.changed_by.username }} - {{ log.created_at|date:'d/m/Y H:i' }}</div>
+                            <div class="text-muted small">{{ log.reason }}</div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted small">Sem edições registadas para este carro.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

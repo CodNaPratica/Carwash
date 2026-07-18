@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% block title %}Carros - CarWash{% endblock %}
+{% block page_icon %}<div class="cw-topbar-icon"><i class="bi bi-car-front"></i></div>{% endblock %}
+{% block page_title %}Carros{% endblock %}
+{% block page_subtitle %}Registo, adoção e acompanhamento dos carros a lavar{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-end mb-3">
+    <button type="button" class="btn btn-cw-orange" data-bs-toggle="modal" data-bs-target="#createVehicleModal">
+        <i class="bi bi-plus-circle me-1"></i> Registar carro
+    </button>
+</div>
+<div class="cw-card p-2 p-md-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Matrícula</th>
+                    <th>Marca / Modelo</th>
+                    <th>Serviço</th>
+                    <th>Estado</th>
+                    <th>Registado por</th>
+                    <th>Adotado por</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry, edit_form, trash_form in rows %}
+                <tr>
+                    <td>{{ entry.plate }}</td>
+                    <td>{{ entry.brand }} {{ entry.model }}</td>
+                    <td>{{ entry.service|default:'-' }}</td>
+                    <td><span class="badge bg-secondary">{{ entry.get_status_display }}</span></td>
+                    <td>{{ entry.registered_by.username }}</td>
+                    <td>{{ entry.claimed_by.username|default:'-' }}</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editModal{{ entry.pk }}">Editar</button>
+                        {% if entry.status == 'pendente' %}
+                        <a href="{% url 'vehicles:adopt' entry.pk %}" class="btn btn-sm btn-outline-success">Adotar</a>
+                        {% endif %}
+                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#trashModal{{ entry.pk }}">Apagar</button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="text-center text-muted py-4">Sem registos.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{# ===== Create modal ===== #}
+<div class="modal fade" id="createVehicleModal" tabindex="-1" aria-hidden="true"
+     {% if open_create %}data-autoopen="true"{% endif %}>
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down modal-lg">
+        <div class="modal-content cw-form-modal">
+            <div class="row g-0">
+                <div class="col-lg-4 cw-form-side">
+                    <div class="cw-form-side-icon"><i class="bi bi-car-front-fill"></i></div>
+                    <div class="cw-form-side-title">Inscrição</div>
+                    <div class="cw-form-side-subtitle">Novo carro</div>
+                    <div class="cw-form-step">
+                        <div class="cw-form-step-icon"><i class="bi bi-clipboard-check"></i></div>
+                        <div>
+                            <div class="cw-form-step-title">Dados do Carro</div>
+                            <div class="cw-form-step-subtitle">Identificação e serviço</div>
+                        </div>
+                    </div>
+                    <div class="cw-form-tip">
+                        <div class="cw-form-tip-title"><i class="bi bi-stars"></i> DICA</div>
+                        <p>O carro fica com estado "Pendente" até um segurança o adotar. A foto e o serviço são opcionais nesta etapa.</p>
+                    </div>
+                </div>
+                <div class="col-lg-8 cw-form-main">
+                    <button type="button" class="cw-form-close" data-bs-dismiss="modal" aria-label="Fechar"><i class="bi bi-x-lg"></i></button>
+                    <div class="cw-form-breadcrumb">Carros <i class="bi bi-chevron-right"></i> <span>NOVO REGISTO</span></div>
+                    <h4 class="cw-form-title">Registo de Carro</h4>
+                    <div class="cw-form-section-header">
+                        <div class="cw-form-section-icon"><i class="bi bi-car-front"></i></div>
+                        <span>Identificação</span>
+                    </div>
+                    <form method="post" action="{% url 'vehicles:create' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% include 'partials/form_fields.html' with form=create_form %}
+                        <div class="cw-form-footer">
+                            <button type="button" class="btn btn-cw-ghost" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-cw-orange">Guardar <i class="bi bi-arrow-right ms-1"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ===== Per-row edit / trash modals ===== #}
+{% for entry, edit_form, trash_form in rows %}
+<div class="modal fade" id="editModal{{ entry.pk }}" tabindex="-1" aria-hidden="true"
+     {% if open_edit_pk == entry.pk %}data-autoopen="true"{% endif %}>
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down modal-lg">
+        <div class="modal-content cw-form-modal">
+            <div class="row g-0">
+                <div class="col-lg-4 cw-form-side">
+                    <div class="cw-form-side-icon"><i class="bi bi-pencil-square"></i></div>
+                    <div class="cw-form-side-title">Edição</div>
+                    <div class="cw-form-side-subtitle">{{ entry.plate }}</div>
+                    <div class="cw-form-step">
+                        <div class="cw-form-step-icon"><i class="bi bi-clock-history"></i></div>
+                        <div>
+                            <div class="cw-form-step-title">Alterar Dados</div>
+                            <div class="cw-form-step-subtitle">Com justificação</div>
+                        </div>
+                    </div>
+                    <div class="cw-form-tip">
+                        <div class="cw-form-tip-title"><i class="bi bi-stars"></i> DICA</div>
+                        <p>Toda edição fica registada na auditoria com o motivo indicado, para o admin poder consultar depois.</p>
+                    </div>
+                </div>
+                <div class="col-lg-8 cw-form-main">
+                    <button type="button" class="cw-form-close" data-bs-dismiss="modal" aria-label="Fechar"><i class="bi bi-x-lg"></i></button>
+                    <div class="cw-form-breadcrumb">Carros <i class="bi bi-chevron-right"></i> <span>EDITAR</span></div>
+                    <h4 class="cw-form-title">Editar Carro</h4>
+                    <div class="cw-form-section-header">
+                        <div class="cw-form-section-icon"><i class="bi bi-pencil"></i></div>
+                        <span>Dados e motivo da alteração</span>
+                    </div>
+                    <form method="post" action="{% url 'vehicles:edit' entry.pk %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% include 'partials/form_fields.html' with form=edit_form %}
+                        <div class="cw-form-footer">
+                            <button type="button" class="btn btn-cw-ghost" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-cw-orange">Guardar <i class="bi bi-arrow-right ms-1"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="trashModal{{ entry.pk }}" tabindex="-1" aria-hidden="true"
+     {% if open_trash_pk == entry.pk %}data-autoopen="true"{% endif %}>
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down modal-lg">
+        <div class="modal-content cw-form-modal">
+            <div class="row g-0">
+                <div class="col-lg-4 cw-form-side">
+                    <div class="cw-form-side-icon"><i class="bi bi-trash-fill"></i></div>
+                    <div class="cw-form-side-title">Lixo</div>
+                    <div class="cw-form-side-subtitle">{{ entry.plate }}</div>
+                    <div class="cw-form-step">
+                        <div class="cw-form-step-icon"><i class="bi bi-exclamation-triangle"></i></div>
+                        <div>
+                            <div class="cw-form-step-title">Confirmar remoção</div>
+                            <div class="cw-form-step-subtitle">Vai para o lixo</div>
+                        </div>
+                    </div>
+                    <div class="cw-form-tip">
+                        <div class="cw-form-tip-title"><i class="bi bi-stars"></i> DICA</div>
+                        <p>O registo não é apagado de verdade: vai para o lixo, onde só o admin consegue ver e consultar o motivo.</p>
+                    </div>
+                </div>
+                <div class="col-lg-8 cw-form-main">
+                    <button type="button" class="cw-form-close" data-bs-dismiss="modal" aria-label="Fechar"><i class="bi bi-x-lg"></i></button>
+                    <div class="cw-form-breadcrumb">Carros <i class="bi bi-chevron-right"></i> <span>APAGAR</span></div>
+                    <h4 class="cw-form-title">Apagar: {{ entry.brand }} {{ entry.model }} ({{ entry.plate }})</h4>
+                    <div class="cw-form-section-header">
+                        <div class="cw-form-section-icon"><i class="bi bi-info-circle"></i></div>
+                        <span>Motivo</span>
+                    </div>
+                    <form method="post" action="{% url 'vehicles:trash' entry.pk %}">
+                        {% csrf_token %}
+                        {% include 'partials/form_fields.html' with form=trash_form %}
+                        <div class="cw-form-footer">
+                            <button type="button" class="btn btn-cw-ghost" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-danger rounded-pill px-4">Confirmar <i class="bi bi-trash ms-1"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Login - CarWash{% endblock %}
+{% block content %}
+<div class="cw-login-wrapper">
+    <div class="card cw-login-card border-0">
+        <div class="row g-0">
+            <div class="col-md-5 cw-login-side">
+                <div class="cw-login-logo">
+                    <i class="bi bi-droplet-half"></i>
+                </div>
+                <div class="cw-brand-name">CarWash</div>
+                <div class="cw-brand-tagline">Gestão inteligente</div>
+                <div class="cw-divider"><span></span></div>
+                <p class="mb-0" style="color: rgba(255,255,255,.8);">
+                    Sistema de gestão completo para a lavagem: registo de carros, caixa e fechamentos, tudo num só lugar.
+                </p>
+            </div>
+            <div class="col-md-7 cw-login-form-side">
+                <h2 class="fw-bold" style="color: var(--cw-navy);">Bem-vindo</h2>
+                <p class="text-muted mb-4">Entre com as suas credenciais</p>
+
+                {% if form.errors %}
+                <div class="alert alert-danger">Utilizador ou palavra-passe inválidos.</div>
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nome de utilizador</label>
+                        <div class="input-group cw-input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            {{ form.username }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Palavra-passe</label>
+                        <div class="input-group cw-input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            {{ form.password }}
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-cw-orange w-100 mt-2">
+                        Entrar <i class="bi bi-arrow-right ms-1"></i>
+                    </button>
+                </form>
+
+                <div class="cw-divider"><span></span></div>
+                <p class="text-center text-muted small mb-0">Sistema exclusivo para a equipa CarWash</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

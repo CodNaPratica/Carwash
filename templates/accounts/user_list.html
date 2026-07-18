@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% block title %}Usuários - CarWash{% endblock %}
+{% block page_icon %}<div class="cw-topbar-icon"><i class="bi bi-people"></i></div>{% endblock %}
+{% block page_title %}Usuários{% endblock %}
+{% block page_subtitle %}Gestão de contas e perfis de acesso{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-end mb-3">
+    <button type="button" class="btn btn-cw-orange" data-bs-toggle="modal" data-bs-target="#createUserModal">
+        <i class="bi bi-plus-circle me-1"></i> Novo utilizador
+    </button>
+</div>
+<div class="cw-card p-2 p-md-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Utilizador</th>
+                    <th>Nome</th>
+                    <th>Perfil</th>
+                    <th>Estado</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u, edit_form, pw_form in rows %}
+                <tr>
+                    <td>{{ u.username }}</td>
+                    <td>{{ u.get_full_name|default:'-' }}</td>
+                    <td><span class="badge bg-secondary">{{ u.get_role_display }}</span></td>
+                    <td>
+                        {% if u.is_active %}<span class="badge bg-success">Ativo</span>{% else %}<span class="badge bg-danger">Inativo</span>{% endif %}
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editUserModal{{ u.pk }}">Editar</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#passwordModal{{ u.pk }}">
+                            <i class="bi bi-key"></i> Password
+                        </button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="text-center text-muted py-4">Nenhum utilizador.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{# ===== Create modal ===== #}
+<div class="modal fade" id="createUserModal" tabindex="-1" aria-hidden="true" {% if open_create %}data-autoopen="true"{% endif %}>
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down modal-lg">
+        <div class="modal-content cw-form-modal">
+            <div class="row g-0">
+                <div class="col-lg-4 cw-form-side">
+                    <div class="cw-form-side-icon"><i class="bi bi-person-plus-fill"></i></div>
+                    <div class="cw-form-side-title">Equipa</div>
+                    <div class="cw-form-side-subtitle">Novo utilizador</div>
+                    <div class="cw-form-step">
+                        <div class="cw-form-step-icon"><i class="bi bi-shield-lock"></i></div>
+                        <div>
+                            <div class="cw-form-step-title">Conta e Perfil</div>
+                            <div class="cw-form-step-subtitle">Acesso ao sistema</div>
+                        </div>
+                    </div>
+                    <div class="cw-form-tip">
+                        <div class="cw-form-tip-title"><i class="bi bi-stars"></i> DICA</div>
+                        <p>O perfil (segurança, tesoureira ou admin) define o que a pessoa vê e pode fazer no sistema.</p>
+                    </div>
+                </div>
+                <div class="col-lg-8 cw-form-main">
+                    <button type="button" class="cw-form-close" data-bs-dismiss="modal" aria-label="Fechar"><i class="bi bi-x-lg"></i></button>
+                    <div class="cw-form-breadcrumb">Usuários <i class="bi bi-chevron-right"></i> <span>NOVO UTILIZADOR</span></div>
+                    <h4 class="cw-form-title">Novo Utilizador</h4>
+                    <div class="cw-form-section-header">
+                        <div class="cw-form-section-icon"><i class="bi bi-person"></i></div>
+                        <span>Dados da conta</span>
+                    </div>
+                    <form method="post" action="{% url 'user_create' %}">
+                        {% csrf_token %}
+                        {% include 'partials/form_fields.html' with form=create_form %}
+                        <div class="cw-form-footer">
+                            <button type="button" class="btn btn-cw-ghost" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-cw-orange">Criar <i class="bi bi-arrow-right ms-1"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% for u, edit_form, pw_form in rows %}
+{# ===== Edit modal ===== #}
+<div class="modal fade" id="editUserModal{{ u.pk }}" tabindex="-1" aria-hidden="true"
+     {% if open_edit_pk == u.pk %}data-autoopen="true"{% endif %}>
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down modal-lg">
+        <div class="modal-content cw-form-modal">
+            <div class="row g-0">
+                <div class="col-lg-4 cw-form-side">
+                    <div class="cw-form-side-icon"><i class="bi bi-pencil-square"></i></div>
+                    <div class="cw-form-side-title">Equipa</div>
+                    <div class="cw-form-side-subtitle">{{ u.username }}</div>
+                    <div class="cw-form-step">
+                        <div class="cw-form-step-icon"><i class="bi bi-shield-lock"></i></div>
+                        <div>
+                            <div class="cw-form-step-title">Editar Conta</div>
+                            <div class="cw-form-step-subtitle">Perfil e estado</div>
+                        </div>
+                    </div>
+                    <div class="cw-form-tip">
+                        <div class="cw-form-tip-title"><i class="bi bi-stars"></i> DICA</div>
+                        <p>Desative a conta em vez de a apagar, para manter o histórico de ações desta pessoa.</p>
+                    </div>
+                </div>
+                <div class="col-lg-8 cw-form-main">
+                    <button type="button" class="cw-form-close" data-bs-dismiss="modal" aria-label="Fechar"><i class="bi bi-x-lg"></i></button>
+                    <div class="cw-form-breadcrumb">Usuários <i class="bi bi-chevron-right"></i> <span>EDITAR</span></div>
+                    <h4 class="cw-form-title">Editar Utilizador</h4>
+                    <div class="cw-form-section-header">
+                        <div class="cw-form-section-icon"><i class="bi bi-pencil"></i></div>
+                        <span>Dados da conta</span>
+                    </div>
+                    <form method="post" action="{% url 'user_edit' u.pk %}">
+                        {% csrf_token %}
+                        {% include 'partials/form_fields.html' with form=edit_form %}
+                        <div class="cw-form-footer">
+                            <button type="button" class="btn btn-cw-ghost" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-cw-orange">Guardar <i class="bi bi-arrow-right ms-1"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ===== Set password modal ===== #}
+<div class="modal fade" id="passwordModal{{ u.pk }}" tabindex="-1" aria-hidden="true"
+     {% if open_password_pk == u.pk %}data-autoopen="true"{% endif %}>
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down modal-lg">
+        <div class="modal-content cw-form-modal">
+            <div class="row g-0">
+                <div class="col-lg-4 cw-form-side">
+                    <div class="cw-form-side-icon"><i class="bi bi-key-fill"></i></div>
+                    <div class="cw-form-side-title">Segurança</div>
+                    <div class="cw-form-side-subtitle">{{ u.username }}</div>
+                    <div class="cw-form-step">
+                        <div class="cw-form-step-icon"><i class="bi bi-shield-check"></i></div>
+                        <div>
+                            <div class="cw-form-step-title">Definir Password</div>
+                            <div class="cw-form-step-subtitle">Nova palavra-passe</div>
+                        </div>
+                    </div>
+                    <div class="cw-form-tip">
+                        <div class="cw-form-tip-title"><i class="bi bi-stars"></i> DICA</div>
+                        <p>Use isto quando a pessoa esquecer a password. Avise-a para trocar depois em "Perfil".</p>
+                    </div>
+                </div>
+                <div class="col-lg-8 cw-form-main">
+                    <button type="button" class="cw-form-close" data-bs-dismiss="modal" aria-label="Fechar"><i class="bi bi-x-lg"></i></button>
+                    <div class="cw-form-breadcrumb">Usuários <i class="bi bi-chevron-right"></i> <span>PASSWORD</span></div>
+                    <h4 class="cw-form-title">Definir Password de {{ u.username }}</h4>
+                    <div class="cw-form-section-header">
+                        <div class="cw-form-section-icon"><i class="bi bi-key"></i></div>
+                        <span>Nova palavra-passe</span>
+                    </div>
+                    <form method="post" action="{% url 'user_set_password' u.pk %}">
+                        {% csrf_token %}
+                        {% include 'partials/form_fields.html' with form=pw_form %}
+                        <div class="cw-form-footer">
+                            <button type="button" class="btn btn-cw-ghost" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-cw-orange">Definir <i class="bi bi-arrow-right ms-1"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard - CarWash{% endblock %}
+
+{% block page_icon %}<div class="cw-topbar-icon"><i class="bi bi-speedometer2"></i></div>{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block page_subtitle %}Visão geral dos carros, do caixa e da equipa{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="cw-stat-tile">
+            <div class="cw-stat-icon bg-orange"><i class="bi bi-car-front-fill"></i></div>
+            <div>
+                <div class="cw-stat-value">{{ pending_count }}</div>
+                <div class="cw-stat-label">Carros pendentes</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="cw-stat-tile">
+            <div class="cw-stat-icon bg-good"><i class="bi bi-cash-coin"></i></div>
+            <div>
+                <div class="cw-stat-value">{{ total_in }}</div>
+                <div class="cw-stat-label">Recebido hoje</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="cw-stat-tile">
+            <div class="cw-stat-icon bg-muted"><i class="bi bi-trash"></i></div>
+            <div>
+                <div class="cw-stat-value">{{ trashed_count }}</div>
+                <div class="cw-stat-label">No lixo (auditoria)</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="cw-stat-tile">
+            <div class="cw-stat-icon bg-navy"><i class="bi bi-people-fill"></i></div>
+            <div>
+                <div class="cw-stat-value">{{ users_count }}</div>
+                <div class="cw-stat-label">Utilizadores</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="cw-card p-3 p-md-4 mb-4">
+    <div class="d-flex align-items-center gap-2 mb-3">
+        <div class="cw-section-icon bg-orange"><i class="bi bi-lightning-charge-fill"></i></div>
+        <div>
+            <h6 class="mb-0 fw-bold">Ações Rápidas</h6>
+        </div>
+    </div>
+    <div class="row g-3">
+        <div class="col-6 col-md-3">
+            <a href="{% url 'vehicles:list' %}" class="cw-action-card">
+                <div class="cw-action-icon"><i class="bi bi-plus-circle"></i></div>
+                <div>
+                    <p class="cw-action-title">Registar carro</p>
+                    <p class="cw-action-subtitle mb-0">Novo carro</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{% url 'vehicles:trash_list' %}" class="cw-action-card">
+                <div class="cw-action-icon"><i class="bi bi-trash"></i></div>
+                <div>
+                    <p class="cw-action-title">Ver lixo</p>
+                    <p class="cw-action-subtitle mb-0">Auditoria</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{% url 'cashbox:closures' %}" class="cw-action-card">
+                <div class="cw-action-icon"><i class="bi bi-lock"></i></div>
+                <div>
+                    <p class="cw-action-title">Fechar período</p>
+                    <p class="cw-action-subtitle mb-0">Semanal / mensal</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-6 col-md-3">
+            <a href="{% url 'cashbox:closures' %}" class="cw-action-card">
+                <div class="cw-action-icon"><i class="bi bi-bar-chart-line"></i></div>
+                <div>
+                    <p class="cw-action-title">Fechamentos</p>
+                    <p class="cw-action-subtitle mb-0">Histórico</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="cw-card p-3 p-md-4">
+    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-2">
+            <div class="cw-section-icon bg-good"><i class="bi bi-graph-up-arrow"></i></div>
+            <div>
+                <h6 class="mb-0 fw-bold">Visão Financeira</h6>
+                <p class="text-muted small mb-0">Resumo do dia</p>
+            </div>
+        </div>
+        {% if last_closure %}
+        <span class="badge text-bg-light border">Fundo de caixa atual: {{ last_closure.carried_forward }}</span>
+        {% endif %}
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="cw-finance-box">
+                <div class="cw-stat-icon bg-good" style="width:36px;height:36px;font-size:1rem;"><i class="bi bi-arrow-down-left"></i></div>
+                <div>
+                    <div class="cw-finance-value">{{ total_in }}</div>
+                    <div class="cw-finance-label">Recebido hoje</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="cw-finance-box">
+                <div class="cw-stat-icon bg-muted" style="width:36px;height:36px;font-size:1rem;"><i class="bi bi-arrow-up-right"></i></div>
+                <div>
+                    <div class="cw-finance-value">{{ total_out }}</div>
+                    <div class="cw-finance-label">Saídas hoje</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="cw-finance-box">
+                <div class="cw-stat-icon bg-navy" style="width:36px;height:36px;font-size:1rem;"><i class="bi bi-wallet2"></i></div>
+                <div>
+                    <div class="cw-finance-value">{{ balance }}</div>
+                    <div class="cw-finance-label">Saldo do dia</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="cw-finance-box">
+                <div class="cw-stat-icon bg-orange" style="width:36px;height:36px;font-size:1rem;"><i class="bi bi-piggy-bank"></i></div>
+                <div>
+                    <div class="cw-finance-value">{{ last_closure.carried_forward|default:'0' }}</div>
+                    <div class="cw-finance-label">Fundo de caixa</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h6 class="fw-semibold small text-muted mb-2">Distribuição do dia (entradas x saídas)</h6>
+    {% if total_in or total_out %}
+    <div class="cw-proportion-bar">
+        <div class="cw-proportion-seg cw-seg-in" style="width: {{ in_pct }}%;"></div>
+        <div class="cw-proportion-seg cw-seg-out" style="width: {{ out_pct }}%;"></div>
+    </div>
+    <div class="cw-proportion-legend">
+        <span><span class="dot in"></span>Entradas ({{ in_pct }}%)</span>
+        <span><span class="dot out"></span>Saídas ({{ out_pct }}%)</span>
+    </div>
+    {% else %}
+    <p class="text-muted small mb-0">Ainda sem movimentos hoje.</p>
+    {% endif %}
+</div>
+{% endblock %}

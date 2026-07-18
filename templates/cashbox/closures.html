@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}Fechamentos - CarWash{% endblock %}
+{% block page_icon %}<div class="cw-topbar-icon"><i class="bi bi-bar-chart-line"></i></div>{% endblock %}
+{% block page_title %}Fechamentos{% endblock %}
+{% block page_subtitle %}Histórico de fechamentos diários, semanais e mensais{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-end mb-3">
+    <button type="button" class="btn btn-cw-orange" data-bs-toggle="modal" data-bs-target="#periodClosureModal">
+        <i class="bi bi-plus-circle me-1"></i> Novo fecho semanal/mensal
+    </button>
+</div>
+<div class="cw-card p-2 p-md-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Tipo</th><th>Início</th><th>Fim</th><th>Entradas</th><th>Saídas</th>
+                    <th>Saldo</th><th>Fundo de caixa</th><th>Fechado por</th><th>Data fecho</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in closures %}
+                <tr>
+                    <td>{{ c.get_period_type_display }}</td>
+                    <td>{{ c.date_start|date:'d/m/Y' }}</td>
+                    <td>{{ c.date_end|date:'d/m/Y' }}</td>
+                    <td>{{ c.total_in }}</td>
+                    <td>{{ c.total_out }}</td>
+                    <td>{{ c.balance }}</td>
+                    <td>{{ c.carried_forward }}</td>
+                    <td>{{ c.closed_by.username }}</td>
+                    <td>{{ c.closed_at|date:'d/m/Y H:i' }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="9" class="text-center text-muted py-4">Sem fechamentos ainda.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{# ===== Period closure modal ===== #}
+<div class="modal fade" id="periodClosureModal" tabindex="-1" aria-hidden="true" {% if open_period_modal %}data-autoopen="true"{% endif %}>
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down modal-lg">
+        <div class="modal-content cw-form-modal">
+            <div class="row g-0">
+                <div class="col-lg-4 cw-form-side">
+                    <div class="cw-form-side-icon"><i class="bi bi-bar-chart-line"></i></div>
+                    <div class="cw-form-side-title">Fechamentos</div>
+                    <div class="cw-form-side-subtitle">Semanal / mensal</div>
+                    <div class="cw-form-step">
+                        <div class="cw-form-step-icon"><i class="bi bi-calendar-range"></i></div>
+                        <div>
+                            <div class="cw-form-step-title">Definir período</div>
+                            <div class="cw-form-step-subtitle">E fundo de caixa</div>
+                        </div>
+                    </div>
+                    <div class="cw-form-tip">
+                        <div class="cw-form-tip-title"><i class="bi bi-stars"></i> DICA</div>
+                        <p>Só é possível fechar um novo período se o anterior do mesmo tipo já estiver fechado. Pode deixar um valor no caixa (fundo) para o próximo período.</p>
+                    </div>
+                </div>
+                <div class="col-lg-8 cw-form-main">
+                    <button type="button" class="cw-form-close" data-bs-dismiss="modal" aria-label="Fechar"><i class="bi bi-x-lg"></i></button>
+                    <div class="cw-form-breadcrumb">Fechamentos <i class="bi bi-chevron-right"></i> <span>NOVO FECHO</span></div>
+                    <h4 class="cw-form-title">Fechar Caixa (Semanal/Mensal)</h4>
+                    <div class="cw-form-section-header">
+                        <div class="cw-form-section-icon"><i class="bi bi-calendar-range"></i></div>
+                        <span>Período e fundo de caixa</span>
+                    </div>
+                    <form method="post" action="{% url 'cashbox:period_closure_create' %}">
+                        {% csrf_token %}
+                        {% include 'partials/form_fields.html' with form=period_form %}
+                        <div class="cw-form-footer">
+                            <button type="button" class="btn btn-cw-ghost" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-cw-orange">Fechar período <i class="bi bi-arrow-right ms-1"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

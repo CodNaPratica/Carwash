@@ -1,0 +1,56 @@
+{% load static %}
+<div class="cw-sidebar-brand">
+    <div class="cw-sidebar-logo"><i class="bi bi-droplet-half"></i></div>
+    <div>
+        <div class="cw-sidebar-brand-name">CarWash</div>
+        <div class="cw-sidebar-brand-tagline">Gestão inteligente</div>
+    </div>
+</div>
+
+<div class="cw-sidebar-user">
+    <div class="cw-sidebar-user-avatar">{{ user.username|slice:':1'|upper }}</div>
+    <div class="min-w-0">
+        <div class="cw-sidebar-user-name">{{ user.get_full_name|default:user.username }}</div>
+        <div class="cw-sidebar-user-role">{{ user.get_role_display }}</div>
+    </div>
+</div>
+
+<nav class="cw-sidebar-nav nav flex-column">
+    {% if user.is_admin_role %}
+    <a class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}"
+       href="{% url 'admin_dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    {% endif %}
+
+    {% if user.is_seguranca or user.is_admin_role %}
+    <a class="nav-link {% if request.resolver_match.app_name == 'vehicles' and request.resolver_match.url_name != 'trash_list' %}active{% endif %}"
+       href="{% url 'vehicles:list' %}"><i class="bi bi-car-front"></i> Carros</a>
+    {% endif %}
+
+    {% if user.is_tesoureira or user.is_admin_role %}
+    <a class="nav-link {% if request.resolver_match.app_name == 'cashbox' and request.resolver_match.url_name != 'closures' and request.resolver_match.url_name != 'period_closure_create' %}active{% endif %}"
+       href="{% url 'cashbox:dashboard' %}"><i class="bi bi-cash-coin"></i> Caixa</a>
+    {% endif %}
+
+    {% if user.is_admin_role %}
+    <a class="nav-link {% if request.resolver_match.url_name == 'trash_list' %}active{% endif %}"
+       href="{% url 'vehicles:trash_list' %}"><i class="bi bi-trash"></i> Lixo</a>
+    <a class="nav-link {% if request.resolver_match.url_name == 'closures' or request.resolver_match.url_name == 'period_closure_create' %}active{% endif %}"
+       href="{% url 'cashbox:closures' %}"><i class="bi bi-bar-chart-line"></i> Fechamentos</a>
+    <a class="nav-link {% if request.resolver_match.app_name == 'services' %}active{% endif %}"
+       href="{% url 'services:list' %}"><i class="bi bi-droplet"></i> Serviços</a>
+    <a class="nav-link {% if request.resolver_match.url_name == 'user_list' %}active{% endif %}"
+       href="{% url 'user_list' %}"><i class="bi bi-people"></i> Usuários</a>
+    {% endif %}
+
+    <a class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}"
+       href="{% url 'profile' %}"><i class="bi bi-person-circle"></i> Perfil</a>
+</nav>
+
+<div class="mt-auto pt-3">
+    <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button class="nav-link border-0 bg-transparent w-100 text-start" type="submit">
+            <i class="bi bi-box-arrow-left"></i> Sair
+        </button>
+    </form>
+</div>

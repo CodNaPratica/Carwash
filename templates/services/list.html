@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% block title %}Serviços - CarWash{% endblock %}
+{% block page_icon %}<div class="cw-topbar-icon"><i class="bi bi-droplet"></i></div>{% endblock %}
+{% block page_title %}Serviços{% endblock %}
+{% block page_subtitle %}Catálogo de serviços e preços{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-end mb-3">
+    <button type="button" class="btn btn-cw-orange" data-bs-toggle="modal" data-bs-target="#createServiceModal">
+        <i class="bi bi-plus-circle me-1"></i> Novo serviço
+    </button>
+</div>
+<div class="cw-card p-2 p-md-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Preço</th>
+                    <th>Estado</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for service, edit_form in rows %}
+                <tr>
+                    <td>{{ service.name }}</td>
+                    <td>{{ service.price }}</td>
+                    <td>
+                        {% if service.active %}
+                        <span class="badge bg-success">Ativo</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Inativo</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editServiceModal{{ service.pk }}">Editar</button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center text-muted py-4">Nenhum serviço cadastrado.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{# ===== Create modal ===== #}
+<div class="modal fade" id="createServiceModal" tabindex="-1" aria-hidden="true" {% if open_create %}data-autoopen="true"{% endif %}>
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down modal-lg">
+        <div class="modal-content cw-form-modal">
+            <div class="row g-0">
+                <div class="col-lg-4 cw-form-side">
+                    <div class="cw-form-side-icon"><i class="bi bi-droplet-fill"></i></div>
+                    <div class="cw-form-side-title">Catálogo</div>
+                    <div class="cw-form-side-subtitle">Novo serviço</div>
+                    <div class="cw-form-step">
+                        <div class="cw-form-step-icon"><i class="bi bi-tag"></i></div>
+                        <div>
+                            <div class="cw-form-step-title">Nome e Preço</div>
+                            <div class="cw-form-step-subtitle">Dados do serviço</div>
+                        </div>
+                    </div>
+                    <div class="cw-form-tip">
+                        <div class="cw-form-tip-title"><i class="bi bi-stars"></i> DICA</div>
+                        <p>Depois de criado, o serviço fica disponível para a tesoureira ligar aos pagamentos e para o segurança indicar no registo do carro.</p>
+                    </div>
+                </div>
+                <div class="col-lg-8 cw-form-main">
+                    <button type="button" class="cw-form-close" data-bs-dismiss="modal" aria-label="Fechar"><i class="bi bi-x-lg"></i></button>
+                    <div class="cw-form-breadcrumb">Serviços <i class="bi bi-chevron-right"></i> <span>NOVO SERVIÇO</span></div>
+                    <h4 class="cw-form-title">Novo Serviço</h4>
+                    <div class="cw-form-section-header">
+                        <div class="cw-form-section-icon"><i class="bi bi-droplet"></i></div>
+                        <span>Identificação</span>
+                    </div>
+                    <form method="post" action="{% url 'services:create' %}">
+                        {% csrf_token %}
+                        {% include 'partials/form_fields.html' with form=create_form %}
+                        <div class="cw-form-footer">
+                            <button type="button" class="btn btn-cw-ghost" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-cw-orange">Guardar <i class="bi bi-arrow-right ms-1"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ===== Per-row edit modals ===== #}
+{% for service, edit_form in rows %}
+<div class="modal fade" id="editServiceModal{{ service.pk }}" tabindex="-1" aria-hidden="true"
+     {% if open_edit_pk == service.pk %}data-autoopen="true"{% endif %}>
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down modal-lg">
+        <div class="modal-content cw-form-modal">
+            <div class="row g-0">
+                <div class="col-lg-4 cw-form-side">
+                    <div class="cw-form-side-icon"><i class="bi bi-pencil-square"></i></div>
+                    <div class="cw-form-side-title">Catálogo</div>
+                    <div class="cw-form-side-subtitle">{{ service.name }}</div>
+                    <div class="cw-form-step">
+                        <div class="cw-form-step-icon"><i class="bi bi-tag"></i></div>
+                        <div>
+                            <div class="cw-form-step-title">Editar Serviço</div>
+                            <div class="cw-form-step-subtitle">Nome, preço e estado</div>
+                        </div>
+                    </div>
+                    <div class="cw-form-tip">
+                        <div class="cw-form-tip-title"><i class="bi bi-stars"></i> DICA</div>
+                        <p>Desative um serviço em vez de o apagar para manter o histórico de pagamentos antigos ligados a ele.</p>
+                    </div>
+                </div>
+                <div class="col-lg-8 cw-form-main">
+                    <button type="button" class="cw-form-close" data-bs-dismiss="modal" aria-label="Fechar"><i class="bi bi-x-lg"></i></button>
+                    <div class="cw-form-breadcrumb">Serviços <i class="bi bi-chevron-right"></i> <span>EDITAR</span></div>
+                    <h4 class="cw-form-title">Editar Serviço</h4>
+                    <div class="cw-form-section-header">
+                        <div class="cw-form-section-icon"><i class="bi bi-pencil"></i></div>
+                        <span>Dados do serviço</span>
+                    </div>
+                    <form method="post" action="{% url 'services:edit' service.pk %}">
+                        {% csrf_token %}
+                        {% include 'partials/form_fields.html' with form=edit_form %}
+                        <div class="cw-form-footer">
+                            <button type="button" class="btn btn-cw-ghost" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-cw-orange">Guardar <i class="bi bi-arrow-right ms-1"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

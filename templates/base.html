@@ -1,0 +1,103 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CarWash{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="{% static 'css/theme.css' %}" rel="stylesheet">
+</head>
+<body{% if user.is_authenticated and not user.is_admin_role %} class="cw-has-bottom-nav"{% endif %}>
+{% if user.is_authenticated %}
+<div class="cw-app">
+    <aside class="cw-sidebar d-none d-lg-flex">
+        {% include 'partials/sidebar_content.html' %}
+    </aside>
+
+    <div class="offcanvas offcanvas-start cw-sidebar-mobile d-lg-none" tabindex="-1" id="cwSidebarOffcanvas">
+        <div class="offcanvas-header">
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
+        </div>
+        <div class="offcanvas-body">
+            {% include 'partials/sidebar_content.html' %}
+        </div>
+    </div>
+
+    <div class="cw-main">
+        <header class="cw-topbar">
+            <div class="cw-topbar-header">
+                <button class="btn d-lg-none p-0 me-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#cwSidebarOffcanvas">
+                    <i class="bi bi-list fs-3" style="color: var(--cw-navy);"></i>
+                </button>
+                {% block page_icon %}<div class="cw-topbar-icon"><i class="bi bi-speedometer2"></i></div>{% endblock %}
+                <div class="min-w-0">
+                    <p class="cw-topbar-title text-truncate">{% block page_title %}CarWash{% endblock %}</p>
+                    <p class="cw-topbar-subtitle text-truncate">{% block page_subtitle %}{% endblock %}</p>
+                </div>
+            </div>
+            <div class="cw-topbar-actions">
+                <i class="bi bi-bell d-none d-sm-inline" style="color: var(--cw-ink-secondary);"></i>
+                <span class="cw-online-pill d-none d-sm-inline-flex">Online</span>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-outline-secondary" type="submit" title="Sair">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+        </header>
+
+        <main class="cw-content">
+{% else %}
+<div class="container">
+{% endif %}
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+            {% block content %}{% endblock %}
+{% if user.is_authenticated %}
+        </main>
+    </div>
+</div>
+
+{% if not user.is_admin_role %}
+<nav class="cw-bottom-nav d-lg-none">
+    {% if user.is_seguranca %}
+    <a class="cw-bottom-nav-link {% if request.resolver_match.app_name == 'vehicles' and request.resolver_match.url_name != 'trash_list' %}active{% endif %}" href="{% url 'vehicles:list' %}">
+        <i class="bi bi-car-front"></i> Carros
+    </a>
+    {% endif %}
+    {% if user.is_tesoureira %}
+    <a class="cw-bottom-nav-link {% if request.resolver_match.app_name == 'cashbox' %}active{% endif %}" href="{% url 'cashbox:dashboard' %}">
+        <i class="bi bi-cash-coin"></i> Caixa
+    </a>
+    {% endif %}
+    <a class="cw-bottom-nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}" href="{% url 'profile' %}">
+        <i class="bi bi-person-circle"></i> Perfil
+    </a>
+    <a class="cw-bottom-nav-link" data-bs-toggle="offcanvas" data-bs-target="#cwSidebarOffcanvas" href="#" role="button">
+        <i class="bi bi-list"></i> Menu
+    </a>
+</nav>
+{% endif %}
+{% else %}
+</div>
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.modal[data-autoopen="true"]').forEach(function (el) {
+            new bootstrap.Modal(el).show();
+        });
+    });
+</script>
+</body>
+</html>
