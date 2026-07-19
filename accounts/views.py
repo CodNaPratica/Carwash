@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LoginView
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
@@ -9,8 +10,21 @@ from cashbox.services import totals_for_range
 from vehicles.models import VehicleEntry
 
 from .decorators import role_required
-from .forms import CwPasswordChangeForm, ProfileForm, SetPasswordForm, UserCreateForm, UserEditForm
+from .forms import BootstrapAuthenticationForm, CwPasswordChangeForm, ProfileForm, SetPasswordForm, UserCreateForm, UserEditForm
 from .models import User
+
+
+class CwLoginView(LoginView):
+    template_name = 'accounts/login.html'
+    authentication_form = BootstrapAuthenticationForm
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        if form.cleaned_data.get('remember_me'):
+            self.request.session.set_expiry(60 * 60 * 24 * 30)  # 30 dias
+        else:
+            self.request.session.set_expiry(0)  # expira ao fechar o navegador
+        return response
 
 
 @login_required

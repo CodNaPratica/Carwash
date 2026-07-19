@@ -9,7 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="{% static 'css/theme.css' %}" rel="stylesheet">
 </head>
-<body{% if user.is_authenticated and not user.is_admin_role %} class="cw-has-bottom-nav"{% endif %}>
+<body{% if user.is_authenticated %} class="cw-has-bottom-nav"{% endif %}>
 {% if user.is_authenticated %}
 <div class="cw-app">
     <aside class="cw-sidebar d-none d-lg-flex">
@@ -36,16 +36,16 @@
                 </div>
             </div>
             <div class="cw-topbar-actions">
-                <span class="cw-online-pill">Online</span>
-                <button type="button" class="cw-icon-btn" title="Notificações">
+                <span class="badge rounded-pill bg-good">Online</span>
+                <button type="button" class="btn bg-navy text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0" style="width: 38px; height: 38px;" title="Notificações">
                     <i class="bi bi-bell"></i>
                 </button>
-                <a href="{% url 'profile' %}" class="cw-icon-btn" title="Perfil e definições">
+                <a href="{% url 'profile' %}" class="btn bg-navy text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0" style="width: 38px; height: 38px;" title="Perfil e definições">
                     <i class="bi bi-gear"></i>
                 </a>
                 <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
-                    <button class="cw-icon-btn" type="submit" title="Sair" style="background: transparent; color: var(--cw-ink-secondary); border: 1px solid #e5e7eb;">
+                    <button class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center p-0" style="width: 38px; height: 38px;" type="submit" title="Sair">
                         <i class="bi bi-box-arrow-right"></i>
                     </button>
                 </form>
@@ -54,11 +54,11 @@
 
         {# ===== Mobile topbar: brand + role portal, clean like the reference ===== #}
         <div class="cw-mobile-topbar d-lg-none">
-            <div class="cw-mobile-topbar-brand">
-                <div class="cw-mobile-topbar-logo"><i class="bi bi-droplet-half"></i></div>
+            <div class="d-flex align-items-center gap-2 min-w-0">
+                <div class="bg-white rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 38px; height: 38px;"><i class="bi bi-droplet-half text-navy"></i></div>
                 <div class="min-w-0">
-                    <div class="cw-mobile-topbar-name">CarWash</div>
-                    <div class="cw-mobile-topbar-tagline">
+                    <div class="text-white fw-bold lh-1">CarWash</div>
+                    <div class="text-orange fw-bold text-uppercase" style="font-size: .68rem;">
                         {% if user.is_seguranca %}Portal do Segurança
                         {% elif user.is_tesoureira %}Portal da Tesoureira
                         {% elif user.is_admin_role %}Portal do Admin
@@ -66,18 +66,13 @@
                     </div>
                 </div>
             </div>
-            <div class="cw-mobile-topbar-actions">
-                <button type="button" class="cw-icon-btn cw-icon-btn-ghost" title="Notificações">
+            <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                <button type="button" class="btn bg-white bg-opacity-25 text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0" style="width: 38px; height: 38px;" title="Notificações">
                     <i class="bi bi-bell"></i>
                 </button>
-                {% if user.is_admin_role %}
-                <button type="button" class="cw-icon-btn cw-icon-btn-ghost" data-bs-toggle="offcanvas" data-bs-target="#cwSidebarOffcanvas" title="Menu">
-                    <i class="bi bi-list"></i>
-                </button>
-                {% endif %}
                 <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
-                    <button class="cw-icon-btn cw-icon-btn-ghost" type="submit" title="Sair">
+                    <button class="btn bg-white bg-opacity-25 text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0" style="width: 38px; height: 38px;" type="submit" title="Sair">
                         <i class="bi bi-box-arrow-right"></i>
                     </button>
                 </form>
@@ -103,29 +98,42 @@
     </div>
 </div>
 
-{% if not user.is_admin_role %}
 <nav class="cw-bottom-nav d-lg-none">
     {% if user.is_seguranca %}
     <a class="cw-bottom-nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'vehicles:home' %}">
         <i class="bi bi-house-door-fill"></i> Início
     </a>
     <a class="cw-bottom-nav-link {% if request.resolver_match.app_name == 'vehicles' and request.resolver_match.url_name != 'home' and request.resolver_match.url_name != 'trash_list' %}active{% endif %}" href="{% url 'vehicles:list' %}">
-        <i class="bi bi-car-front"></i> Registros
+        <i class="bi bi-car-front"></i> Registos
     </a>
-    {% endif %}
-    {% if user.is_tesoureira %}
+    <a class="cw-bottom-nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}" href="{% url 'profile' %}">
+        <i class="bi bi-person-circle"></i> Perfil
+    </a>
+    {% elif user.is_tesoureira %}
     <a class="cw-bottom-nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'cashbox:home' %}">
         <i class="bi bi-house-door-fill"></i> Início
     </a>
     <a class="cw-bottom-nav-link {% if request.resolver_match.app_name == 'cashbox' and request.resolver_match.url_name != 'home' %}active{% endif %}" href="{% url 'cashbox:dashboard' %}">
         <i class="bi bi-cash-coin"></i> Caixa
     </a>
-    {% endif %}
     <a class="cw-bottom-nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}" href="{% url 'profile' %}">
         <i class="bi bi-person-circle"></i> Perfil
     </a>
+    {% elif user.is_admin_role %}
+    <a class="cw-bottom-nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}" href="{% url 'admin_dashboard' %}">
+        <i class="bi bi-house-door-fill"></i> Início
+    </a>
+    <a class="cw-bottom-nav-link {% if request.resolver_match.app_name == 'vehicles' and request.resolver_match.url_name != 'trash_list' %}active{% endif %}" href="{% url 'vehicles:list' %}">
+        <i class="bi bi-car-front"></i> Registos
+    </a>
+    <a class="cw-bottom-nav-link {% if request.resolver_match.app_name == 'cashbox' and request.resolver_match.url_name != 'closures' and request.resolver_match.url_name != 'period_closure_create' %}active{% endif %}" href="{% url 'cashbox:dashboard' %}">
+        <i class="bi bi-cash-coin"></i> Caixa
+    </a>
+    <a class="cw-bottom-nav-link" data-bs-toggle="offcanvas" data-bs-target="#cwSidebarOffcanvas" href="#" role="button">
+        <i class="bi bi-grid-3x3-gap-fill"></i> Mais
+    </a>
+    {% endif %}
 </nav>
-{% endif %}
 {% else %}
 </div>
 {% endif %}
@@ -136,6 +144,45 @@
         document.querySelectorAll('.modal[data-autoopen="true"]').forEach(function (el) {
             new bootstrap.Modal(el).show();
         });
+    });
+
+    // Vehicle type ("model") dropdown: reveal a text input for "Outro (especificar)"
+    // and keep its typed value synced onto the select's custom option, so the
+    // underlying free-text field still receives whatever the user typed.
+    document.addEventListener('change', function (e) {
+        if (!e.target.matches('.cw-model-select')) return;
+        var wrap = e.target.closest('.cw-model-field');
+        var custom = wrap.querySelector('.cw-model-custom');
+        if (e.target.value === '__custom__') {
+            custom.classList.remove('d-none');
+            custom.value = '';
+            custom.focus();
+        } else {
+            custom.classList.add('d-none');
+        }
+    });
+    document.addEventListener('input', function (e) {
+        if (!e.target.matches('.cw-model-custom')) return;
+        var wrap = e.target.closest('.cw-model-field');
+        var select = wrap.querySelector('.cw-model-select');
+        var opt = select.querySelector('option[value="__custom__"]');
+        opt.value = e.target.value;
+    });
+
+    // "Sem matrícula": lock the matrícula input while it's checked, so it
+    // can't be filled in (and clears whatever was typed before checking it).
+    function cwSyncNoPlate(checkbox) {
+        var form = checkbox.closest('form');
+        var plateInput = form && form.querySelector('.cw-plate-input');
+        if (!plateInput) return;
+        plateInput.disabled = checkbox.checked;
+        if (checkbox.checked) plateInput.value = '';
+    }
+    document.addEventListener('change', function (e) {
+        if (e.target.matches('.cw-no-plate-toggle')) cwSyncNoPlate(e.target);
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.cw-no-plate-toggle').forEach(cwSyncNoPlate);
     });
 </script>
 </body>

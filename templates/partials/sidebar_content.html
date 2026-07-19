@@ -1,17 +1,17 @@
 {% load static %}
-<div class="cw-sidebar-brand">
-    <div class="cw-sidebar-logo"><i class="bi bi-droplet-half"></i></div>
+<div class="d-flex align-items-center gap-2 mb-4">
+    <div class="bg-white rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px;"><i class="bi bi-droplet-half text-navy fs-4"></i></div>
     <div>
-        <div class="cw-sidebar-brand-name">CarWash</div>
-        <div class="cw-sidebar-brand-tagline">Gestão inteligente</div>
+        <div class="fw-bold fs-5 lh-1">CarWash</div>
+        <div class="small text-white-50">Gestão inteligente</div>
     </div>
 </div>
 
-<div class="cw-sidebar-user">
-    <div class="cw-sidebar-user-avatar">{{ user.username|slice:':1'|upper }}</div>
+<div class="bg-white bg-opacity-10 rounded-3 p-2 d-flex align-items-center gap-2 mb-4">
+    <div class="rounded-circle bg-orange text-white d-flex align-items-center justify-content-center fw-bold flex-shrink-0" style="width: 38px; height: 38px;">{{ user.username|slice:':1'|upper }}</div>
     <div class="min-w-0">
-        <div class="cw-sidebar-user-name">{{ user.get_full_name|default:user.username }}</div>
-        <div class="cw-sidebar-user-role">{{ user.get_role_display }}</div>
+        <div class="fw-semibold small lh-1">{{ user.get_full_name|default:user.username }}</div>
+        <div class="text-white-50 small">{{ user.get_role_display }}</div>
     </div>
 </div>
 
@@ -27,7 +27,7 @@
     {% endif %}
     {% if user.is_seguranca or user.is_admin_role %}
     <a class="nav-link {% if request.resolver_match.app_name == 'vehicles' and request.resolver_match.url_name != 'trash_list' and request.resolver_match.url_name != 'home' %}active{% endif %}"
-       href="{% url 'vehicles:list' %}"><i class="bi bi-car-front"></i> {% if user.is_seguranca %}Registros{% else %}Carros{% endif %}</a>
+       href="{% url 'vehicles:list' %}"><i class="bi bi-car-front"></i> Registos</a>
     {% endif %}
 
     {% if user.is_tesoureira %}
@@ -40,6 +40,8 @@
     {% endif %}
 
     {% if user.is_admin_role %}
+    <a class="nav-link {% if request.resolver_match.app_name == 'audit' %}active{% endif %}"
+       href="{% url 'audit:reconciliation' %}"><i class="bi bi-shield-check"></i> Conferência</a>
     <a class="nav-link {% if request.resolver_match.url_name == 'trash_list' %}active{% endif %}"
        href="{% url 'vehicles:trash_list' %}"><i class="bi bi-trash"></i> Lixo</a>
     <a class="nav-link {% if request.resolver_match.url_name == 'closures' or request.resolver_match.url_name == 'period_closure_create' %}active{% endif %}"

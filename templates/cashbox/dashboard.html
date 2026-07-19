@@ -13,38 +13,46 @@
 </div>
 {% endif %}
 
-<div class="mb-4 d-flex flex-wrap gap-2">
-    <button type="button" class="btn btn-cw-orange" data-bs-toggle="modal" data-bs-target="#paymentModal">
-        <i class="bi bi-plus-circle me-1"></i> Registar pagamento
-    </button>
-    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#movementModal">
-        <i class="bi bi-receipt me-1"></i> Registar custo/despesa
-    </button>
+<div class="text-uppercase small fw-bold text-secondary mb-3">Ações rápidas</div>
+<div class="row g-2 mb-4" style="max-width: 420px;">
+    <div class="col-6">
+        <button type="button" class="btn btn-warning w-100" data-bs-toggle="modal" data-bs-target="#paymentModal">
+            <i class="bi bi-plus-circle me-1"></i> Pagamento
+        </button>
+    </div>
     {% if not today_closed %}
-    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#todayCloseModal">
-        <i class="bi bi-lock me-1"></i> Fechar caixa de hoje
-    </button>
+    <div class="col-6">
+        <button type="button" class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#todayCloseModal">
+            <i class="bi bi-lock me-1"></i> Fechar Caixa
+        </button>
+    </div>
     {% else %}
-    <span class="badge bg-secondary align-self-center">Caixa de hoje já fechado</span>
+    <div class="col-6 d-flex align-items-center">
+        <span class="badge bg-secondary">Caixa de hoje já fechado</span>
+    </div>
     {% endif %}
+    <div class="col-12">
+        <button type="button" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#movementModal">
+            <i class="bi bi-receipt me-1"></i> Custo/Despesa
+        </button>
+    </div>
 </div>
 
-<h6 class="fw-semibold px-1 mb-2">Pagamentos de hoje</h6>
-<div class="cw-card p-2 p-md-3 mb-4 d-none d-md-block">
+<h6 class="fw-semibold px-1 mb-3">Pagamentos de hoje</h6>
+{% if payments %}
+<div class="bg-white border rounded-4 p-2 p-md-3 mb-4 d-none d-md-block">
     <div class="table-responsive">
-        <table class="table table-sm table-hover align-middle mb-0">
-            <thead><tr><th>Carro</th><th>Serviço</th><th>Valor</th><th>Recebido por</th><th>Hora</th></tr></thead>
+        <table class="table table-sm table-striped table-bordered table-hover align-middle mb-0">
+            <thead><tr><th>Veículo</th><th>Serviço</th><th>Valor</th><th>Recebido por</th><th>Hora</th></tr></thead>
             <tbody>
                 {% for p in payments %}
                 <tr>
-                    <td>{{ p.vehicle_entry|default:'-' }}</td>
+                    <td>{{ p.brand }} {{ p.model }} — {{ p.plate|default:p.alt_identifier }}</td>
                     <td>{{ p.service }}</td>
                     <td>{{ p.amount }}</td>
                     <td>{{ p.received_by.username }}</td>
                     <td>{{ p.created_at|date:'H:i' }}</td>
                 </tr>
-                {% empty %}
-                <tr><td colspan="5" class="text-center text-muted py-4">Sem pagamentos hoje.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -62,20 +70,22 @@
         </div>
         <div class="cw-row-card-grid">
             <div class="cw-row-card-field" style="grid-column: span 2;">
-                <div class="cw-row-card-label">Carro</div>
-                <div class="cw-row-card-value">{{ p.vehicle_entry|default:'-' }}</div>
+                <div class="cw-row-card-label">Veículo</div>
+                <div class="cw-row-card-value">{{ p.brand }} {{ p.model }} — {{ p.plate|default:p.alt_identifier }}</div>
             </div>
         </div>
     </div>
-    {% empty %}
-    <div class="cw-card p-4 text-center text-muted">Sem pagamentos hoje.</div>
     {% endfor %}
 </div>
+{% else %}
+<div class="bg-light rounded-4 p-4 text-center text-muted mb-4">Sem pagamentos hoje.</div>
+{% endif %}
 
-<h6 class="fw-semibold px-1 mb-2">Custos / Despesas de hoje</h6>
-<div class="cw-card p-2 p-md-3 d-none d-md-block">
+<h6 class="fw-semibold px-1 mb-3">Custos / Despesas de hoje</h6>
+{% if movements %}
+<div class="bg-white border rounded-4 p-2 p-md-3 d-none d-md-block">
     <div class="table-responsive">
-        <table class="table table-sm table-hover align-middle mb-0">
+        <table class="table table-sm table-striped table-bordered table-hover align-middle mb-0">
             <thead><tr><th>Categoria</th><th>Descrição</th><th>Valor</th><th>Comprovativo</th><th>Registado por</th><th>Hora</th></tr></thead>
             <tbody>
                 {% for m in movements %}
@@ -87,8 +97,6 @@
                     <td>{{ m.registered_by.username }}</td>
                     <td>{{ m.created_at|date:'H:i' }}</td>
                 </tr>
-                {% empty %}
-                <tr><td colspan="6" class="text-center text-muted py-4">Sem movimentos hoje.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -111,39 +119,29 @@
             </div>
         </div>
     </div>
-    {% empty %}
-    <div class="cw-card p-4 text-center text-muted">Sem movimentos hoje.</div>
     {% endfor %}
 </div>
+{% else %}
+<div class="bg-light rounded-4 p-4 text-center text-muted">Sem movimentos hoje.</div>
+{% endif %}
 
 <h6 class="fw-semibold px-1 mb-2 mt-4">Resumo do dia</h6>
-<div class="row g-3 mb-4">
-    <div class="col-md-4">
-        <div class="cw-stat-tile">
-            <div class="cw-stat-icon bg-good"><i class="bi bi-arrow-down-left"></i></div>
-            <div>
-                <div class="cw-stat-value">{{ total_in }}</div>
-                <div class="cw-stat-label">Total recebido hoje</div>
-            </div>
-        </div>
+<div class="row text-center border rounded-3 py-2 mb-4 g-2">
+    <div class="col-6 col-md-3">
+        <div class="fs-5 fw-bold text-good">{{ total_in }}</div>
+        <div class="text-secondary small">Recebido hoje</div>
     </div>
-    <div class="col-md-4">
-        <div class="cw-stat-tile">
-            <div class="cw-stat-icon bg-muted"><i class="bi bi-arrow-up-right"></i></div>
-            <div>
-                <div class="cw-stat-value">{{ total_out }}</div>
-                <div class="cw-stat-label">Total saídas hoje</div>
-            </div>
-        </div>
+    <div class="col-6 col-md-3">
+        <div class="fs-5 fw-bold text-orange">{{ total_custo }}</div>
+        <div class="text-secondary small">Custos hoje</div>
     </div>
-    <div class="col-md-4">
-        <div class="cw-stat-tile">
-            <div class="cw-stat-icon bg-navy"><i class="bi bi-wallet2"></i></div>
-            <div>
-                <div class="cw-stat-value">{{ balance }}</div>
-                <div class="cw-stat-label">Saldo do dia</div>
-            </div>
-        </div>
+    <div class="col-6 col-md-3">
+        <div class="fs-5 fw-bold text-secondary">{{ total_despesa }}</div>
+        <div class="text-secondary small">Despesas hoje</div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="fs-5 fw-bold text-navy">{{ balance }}</div>
+        <div class="text-secondary small">Saldo do dia</div>
     </div>
 </div>
 
@@ -160,25 +158,32 @@
                         <div class="cw-form-step-icon"><i class="bi bi-wallet2"></i></div>
                         <div>
                             <div class="cw-form-step-title">Valor Recebido</div>
-                            <div class="cw-form-step-subtitle">Carro e serviço</div>
+                            <div class="cw-form-step-subtitle">Veículo e serviço</div>
                         </div>
                     </div>
                     <div class="cw-form-tip">
                         <div class="cw-form-tip-title"><i class="bi bi-stars"></i> DICA</div>
-                        <p>Ligue o pagamento ao carro sempre que possível — isso ajuda o admin a cruzar carros lavados com valores recebidos.</p>
+                        <p>Preencha marca, modelo e matrícula tal como o cliente se apresentou — o admin cruza este registo com o do segurança na Conferência.</p>
                     </div>
                 </div>
                 <div class="col-lg-8 cw-form-main">
                     <button type="button" class="cw-form-close" data-bs-dismiss="modal" aria-label="Fechar"><i class="bi bi-x-lg"></i></button>
                     <div class="cw-form-breadcrumb">Caixa <i class="bi bi-chevron-right"></i> <span>NOVO PAGAMENTO</span></div>
-                    <h4 class="cw-form-title">Registar Pagamento</h4>
+                    <h4 class="fw-bold text-navy mb-4">Registar Pagamento</h4>
                     <div class="cw-form-section-header">
                         <div class="cw-form-section-icon"><i class="bi bi-cash-coin"></i></div>
                         <span>Dados do pagamento</span>
                     </div>
                     <form method="post" action="{% url 'cashbox:payment_create' %}">
                         {% csrf_token %}
-                        {% include 'partials/field.html' with field=payment_form.vehicle_entry %}
+                        {% include 'partials/field.html' with field=payment_form.brand %}
+                        {% include 'partials/field.html' with field=payment_form.model %}
+                        {% include 'partials/field.html' with field=payment_form.plate %}
+                        <div class="form-check mb-3">
+                            {{ payment_form.no_plate }}
+                            <label class="form-check-label" for="{{ payment_form.no_plate.id_for_label }}">Sem matrícula</label>
+                        </div>
+                        {% include 'partials/field.html' with field=payment_form.alt_identifier %}
 
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Serviço <span class="text-danger">*</span></label>
@@ -199,19 +204,21 @@
                                         <input type="number" id="quickServicePrice" class="form-control form-control-sm cw-form-input" placeholder="Preço" step="0.01">
                                     </div>
                                     <div class="col-2">
-                                        <button type="button" id="quickServiceSubmit" class="btn btn-sm btn-cw-orange w-100">OK</button>
+                                        <button type="button" id="quickServiceSubmit" class="btn btn-sm btn-warning w-100">OK</button>
                                     </div>
                                 </div>
                                 <div id="quickServiceError" class="text-danger small mt-1"></div>
                             </div>
                         </div>
 
+                        {% include 'partials/field.html' with field=payment_form.price_charged %}
                         {% include 'partials/field.html' with field=payment_form.amount %}
+                        {% include 'partials/field.html' with field=payment_form.payment_method %}
                         {% include 'partials/field.html' with field=payment_form.notes %}
 
                         <div class="cw-form-footer">
-                            <button type="button" class="btn btn-cw-ghost" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-cw-orange">Guardar <i class="bi bi-arrow-right ms-1"></i></button>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-warning">Guardar <i class="bi bi-arrow-right ms-1"></i></button>
                         </div>
                     </form>
                 </div>
@@ -244,7 +251,7 @@
                 <div class="col-lg-8 cw-form-main">
                     <button type="button" class="cw-form-close" data-bs-dismiss="modal" aria-label="Fechar"><i class="bi bi-x-lg"></i></button>
                     <div class="cw-form-breadcrumb">Caixa <i class="bi bi-chevron-right"></i> <span>CUSTO / DESPESA</span></div>
-                    <h4 class="cw-form-title">Registar Custo / Despesa</h4>
+                    <h4 class="fw-bold text-navy mb-4">Registar Custo / Despesa</h4>
                     <div class="cw-form-section-header">
                         <div class="cw-form-section-icon"><i class="bi bi-receipt"></i></div>
                         <span>Dados da saída</span>
@@ -253,8 +260,8 @@
                         {% csrf_token %}
                         {% include 'partials/form_fields.html' with form=movement_form %}
                         <div class="cw-form-footer">
-                            <button type="button" class="btn btn-cw-ghost" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-cw-orange">Guardar <i class="bi bi-arrow-right ms-1"></i></button>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-warning">Guardar <i class="bi bi-arrow-right ms-1"></i></button>
                         </div>
                     </form>
                 </div>
@@ -288,36 +295,30 @@
                 <div class="col-lg-8 cw-form-main">
                     <button type="button" class="cw-form-close" data-bs-dismiss="modal" aria-label="Fechar"><i class="bi bi-x-lg"></i></button>
                     <div class="cw-form-breadcrumb">Caixa <i class="bi bi-chevron-right"></i> <span>FECHO PENDENTE</span></div>
-                    <h4 class="cw-form-title">Fechar caixa - {{ unclosed_day|date:'d/m/Y' }}</h4>
+                    <h4 class="fw-bold text-navy mb-4">Fechar caixa - {{ unclosed_day|date:'d/m/Y' }}</h4>
                     <div class="cw-form-section-header">
                         <div class="cw-form-section-icon"><i class="bi bi-clipboard-data"></i></div>
                         <span>Resumo do dia</span>
                     </div>
-                    <div class="row g-3 mb-3">
+                    <div class="row text-center border rounded-3 py-2 mb-3 g-2">
                         <div class="col-4">
-                            <div class="cw-finance-box">
-                                <div class="cw-stat-icon bg-good" style="width:36px;height:36px;font-size:1rem;"><i class="bi bi-arrow-down-left"></i></div>
-                                <div><div class="cw-finance-value">{{ unclosed_total_in }}</div><div class="cw-finance-label">Recebido</div></div>
-                            </div>
+                            <div class="fs-5 fw-bold text-good">{{ unclosed_total_in }}</div>
+                            <div class="text-secondary small">Recebido</div>
                         </div>
                         <div class="col-4">
-                            <div class="cw-finance-box">
-                                <div class="cw-stat-icon bg-muted" style="width:36px;height:36px;font-size:1rem;"><i class="bi bi-arrow-up-right"></i></div>
-                                <div><div class="cw-finance-value">{{ unclosed_total_out }}</div><div class="cw-finance-label">Saídas</div></div>
-                            </div>
+                            <div class="fs-5 fw-bold text-secondary">{{ unclosed_total_out }}</div>
+                            <div class="text-secondary small">Saídas</div>
                         </div>
                         <div class="col-4">
-                            <div class="cw-finance-box">
-                                <div class="cw-stat-icon bg-navy" style="width:36px;height:36px;font-size:1rem;"><i class="bi bi-wallet2"></i></div>
-                                <div><div class="cw-finance-value">{{ unclosed_balance }}</div><div class="cw-finance-label">Saldo</div></div>
-                            </div>
+                            <div class="fs-5 fw-bold text-navy">{{ unclosed_balance }}</div>
+                            <div class="text-secondary small">Saldo</div>
                         </div>
                     </div>
                     <form method="post" action="{% url 'cashbox:daily_closure' unclosed_day %}">
                         {% csrf_token %}
                         <div class="cw-form-footer">
-                            <button type="button" class="btn btn-cw-ghost" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-cw-orange">Confirmar fecho <i class="bi bi-check2 ms-1"></i></button>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-warning">Confirmar fecho <i class="bi bi-check2 ms-1"></i></button>
                         </div>
                     </form>
                 </div>
@@ -351,36 +352,30 @@
                 <div class="col-lg-8 cw-form-main">
                     <button type="button" class="cw-form-close" data-bs-dismiss="modal" aria-label="Fechar"><i class="bi bi-x-lg"></i></button>
                     <div class="cw-form-breadcrumb">Caixa <i class="bi bi-chevron-right"></i> <span>FECHO DIÁRIO</span></div>
-                    <h4 class="cw-form-title">Fechar caixa - {{ today|date:'d/m/Y' }}</h4>
+                    <h4 class="fw-bold text-navy mb-4">Fechar caixa - {{ today|date:'d/m/Y' }}</h4>
                     <div class="cw-form-section-header">
                         <div class="cw-form-section-icon"><i class="bi bi-clipboard-data"></i></div>
                         <span>Resumo do dia</span>
                     </div>
-                    <div class="row g-3 mb-3">
+                    <div class="row text-center border rounded-3 py-2 mb-3 g-2">
                         <div class="col-4">
-                            <div class="cw-finance-box">
-                                <div class="cw-stat-icon bg-good" style="width:36px;height:36px;font-size:1rem;"><i class="bi bi-arrow-down-left"></i></div>
-                                <div><div class="cw-finance-value">{{ total_in }}</div><div class="cw-finance-label">Recebido</div></div>
-                            </div>
+                            <div class="fs-5 fw-bold text-good">{{ total_in }}</div>
+                            <div class="text-secondary small">Recebido</div>
                         </div>
                         <div class="col-4">
-                            <div class="cw-finance-box">
-                                <div class="cw-stat-icon bg-muted" style="width:36px;height:36px;font-size:1rem;"><i class="bi bi-arrow-up-right"></i></div>
-                                <div><div class="cw-finance-value">{{ total_out }}</div><div class="cw-finance-label">Saídas</div></div>
-                            </div>
+                            <div class="fs-5 fw-bold text-secondary">{{ total_out }}</div>
+                            <div class="text-secondary small">Saídas</div>
                         </div>
                         <div class="col-4">
-                            <div class="cw-finance-box">
-                                <div class="cw-stat-icon bg-navy" style="width:36px;height:36px;font-size:1rem;"><i class="bi bi-wallet2"></i></div>
-                                <div><div class="cw-finance-value">{{ balance }}</div><div class="cw-finance-label">Saldo</div></div>
-                            </div>
+                            <div class="fs-5 fw-bold text-navy">{{ balance }}</div>
+                            <div class="text-secondary small">Saldo</div>
                         </div>
                     </div>
                     <form method="post" action="{% url 'cashbox:daily_closure' today %}">
                         {% csrf_token %}
                         <div class="cw-form-footer">
-                            <button type="button" class="btn btn-cw-ghost" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-cw-orange">Confirmar fecho <i class="bi bi-check2 ms-1"></i></button>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-warning">Confirmar fecho <i class="bi bi-check2 ms-1"></i></button>
                         </div>
                     </form>
                 </div>
@@ -446,6 +441,30 @@
             errBox.textContent = 'Erro de rede ao criar o serviço.';
         });
     });
+})();
+
+(function () {
+    var modelSelect = document.getElementById('id_model');
+    var serviceSelect = document.getElementById('id_service');
+    var priceInput = document.getElementById('id_price_charged');
+    if (!modelSelect || !serviceSelect || !priceInput) return;
+
+    function fetchPrice() {
+        var serviceId = serviceSelect.value;
+        if (!serviceId) return;
+        var vehicleTypeId = modelSelect.value;
+        if (!vehicleTypeId || vehicleTypeId === '__custom__') vehicleTypeId = '';
+        var url = "{% url 'services:price_lookup' %}?service=" + encodeURIComponent(serviceId) + "&vehicle_type=" + encodeURIComponent(vehicleTypeId);
+        fetch(url)
+            .then(function (res) { return res.ok ? res.json() : null; })
+            .then(function (data) {
+                if (data && data.price) priceInput.value = data.price;
+            })
+            .catch(function () {});
+    }
+
+    modelSelect.addEventListener('change', fetchPrice);
+    serviceSelect.addEventListener('change', fetchPrice);
 })();
 </script>
 {% endblock %}

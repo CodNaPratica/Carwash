@@ -1,3 +1,21 @@
+{% if field.field.widget.input_type == 'checkbox' %}
+<div class="form-check mb-3">
+    {{ field }}
+    <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+    {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors }}</div>{% endif %}
+</div>
+{% elif field.name == 'model' %}
+<div class="mb-3 cw-model-field">
+    <label class="form-label fw-semibold">
+        {{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}
+    </label>
+    {{ field }}
+    <input type="text" class="form-control cw-form-input cw-model-custom mt-2 d-none" placeholder="Escreva o tipo de veículo">
+    {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+    {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors }}</div>{% endif %}
+</div>
+{% else %}
 <div class="mb-3">
     <label class="form-label fw-semibold">
         {{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}
@@ -6,3 +24,4 @@
     {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
     {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors }}</div>{% endif %}
 </div>
+{% endif %}

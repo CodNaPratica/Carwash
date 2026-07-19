@@ -31,5 +31,13 @@ def totals_for_range(date_start, date_end):
     return total_in, total_out
 
 
+def movement_breakdown(date_start, date_end):
+    """Devolve (total_custo, total_despesa) para o período - as duas categorias de saída."""
+    qs = CashMovement.objects.filter(created_at__date__gte=date_start, created_at__date__lte=date_end)
+    total_custo = qs.filter(category=CashMovement.Category.CUSTO).aggregate(total=Sum('amount'))['total'] or 0
+    total_despesa = qs.filter(category=CashMovement.Category.DESPESA).aggregate(total=Sum('amount'))['total'] or 0
+    return total_custo, total_despesa
+
+
 def last_closure(period_type):
     return CashClosure.objects.filter(period_type=period_type).order_by('-date_end').first()

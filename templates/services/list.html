@@ -6,14 +6,14 @@
 {% block mobile_header %}{% include 'partials/mobile_page_header.html' with icon='bi-droplet' title='Serviços' subtitle='Catálogo de serviços e preços' %}{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-end mb-3">
-    <button type="button" class="btn btn-cw-orange" data-bs-toggle="modal" data-bs-target="#createServiceModal">
+    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#createServiceModal">
         <i class="bi bi-plus-circle me-1"></i> Novo serviço
     </button>
 </div>
 {# ===== Desktop: table ===== #}
-<div class="cw-card p-2 p-md-3 d-none d-md-block">
+<div class="bg-white border rounded-4 p-2 p-md-3 d-none d-md-block">
     <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
+        <table class="table table-striped table-bordered table-hover align-middle mb-0">
             <thead>
                 <tr>
                     <th>Nome</th>
@@ -23,7 +23,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for service, edit_form in rows %}
+                {% for service, edit_form, price_rows in rows %}
                 <tr>
                     <td>{{ service.name }}</td>
                     <td>{{ service.price }}</td>
@@ -34,8 +34,9 @@
                         <span class="badge bg-secondary">Inativo</span>
                         {% endif %}
                     </td>
-                    <td>
+                    <td class="d-flex gap-2">
                         <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editServiceModal{{ service.pk }}">Editar</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#servicePricesModal{{ service.pk }}"><i class="bi bi-currency-exchange"></i> Preços</button>
                     </td>
                 </tr>
                 {% empty %}
@@ -48,7 +49,7 @@
 
 {# ===== Mobile: stacked cards ===== #}
 <div class="d-md-none">
-    {% for service, edit_form in rows %}
+    {% for service, edit_form, price_rows in rows %}
     <div class="cw-row-card">
         <div class="cw-row-card-header">
             <div>
@@ -65,10 +66,13 @@
             <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editServiceModal{{ service.pk }}">
                 <i class="bi bi-pencil"></i> Editar
             </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#servicePricesModal{{ service.pk }}">
+                <i class="bi bi-currency-exchange"></i> Preços
+            </button>
         </div>
     </div>
     {% empty %}
-    <div class="cw-card p-4 text-center text-muted">Nenhum serviço cadastrado.</div>
+    <div class="bg-white border rounded-4 p-4 text-center text-muted">Nenhum serviço cadastrado.</div>
     {% endfor %}
 </div>
 
@@ -90,13 +94,13 @@
                     </div>
                     <div class="cw-form-tip">
                         <div class="cw-form-tip-title"><i class="bi bi-stars"></i> DICA</div>
-                        <p>Depois de criado, o serviço fica disponível para a tesoureira ligar aos pagamentos e para o segurança indicar no registo do carro.</p>
+                        <p>Depois de criado, o serviço fica disponível para a tesoureira ligar aos pagamentos e para o segurança indicar no registo do veículo.</p>
                     </div>
                 </div>
                 <div class="col-lg-8 cw-form-main">
                     <button type="button" class="cw-form-close" data-bs-dismiss="modal" aria-label="Fechar"><i class="bi bi-x-lg"></i></button>
                     <div class="cw-form-breadcrumb">Serviços <i class="bi bi-chevron-right"></i> <span>NOVO SERVIÇO</span></div>
-                    <h4 class="cw-form-title">Novo Serviço</h4>
+                    <h4 class="fw-bold text-navy mb-4">Novo Serviço</h4>
                     <div class="cw-form-section-header">
                         <div class="cw-form-section-icon"><i class="bi bi-droplet"></i></div>
                         <span>Identificação</span>
@@ -105,8 +109,8 @@
                         {% csrf_token %}
                         {% include 'partials/form_fields.html' with form=create_form %}
                         <div class="cw-form-footer">
-                            <button type="button" class="btn btn-cw-ghost" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-cw-orange">Guardar <i class="bi bi-arrow-right ms-1"></i></button>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-warning">Guardar <i class="bi bi-arrow-right ms-1"></i></button>
                         </div>
                     </form>
                 </div>
@@ -116,7 +120,7 @@
 </div>
 
 {# ===== Per-row edit modals ===== #}
-{% for service, edit_form in rows %}
+{% for service, edit_form, price_rows in rows %}
 <div class="modal fade" id="editServiceModal{{ service.pk }}" tabindex="-1" aria-hidden="true"
      {% if open_edit_pk == service.pk %}data-autoopen="true"{% endif %}>
     <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down modal-lg">
@@ -141,7 +145,7 @@
                 <div class="col-lg-8 cw-form-main">
                     <button type="button" class="cw-form-close" data-bs-dismiss="modal" aria-label="Fechar"><i class="bi bi-x-lg"></i></button>
                     <div class="cw-form-breadcrumb">Serviços <i class="bi bi-chevron-right"></i> <span>EDITAR</span></div>
-                    <h4 class="cw-form-title">Editar Serviço</h4>
+                    <h4 class="fw-bold text-navy mb-4">Editar Serviço</h4>
                     <div class="cw-form-section-header">
                         <div class="cw-form-section-icon"><i class="bi bi-pencil"></i></div>
                         <span>Dados do serviço</span>
@@ -150,12 +154,45 @@
                         {% csrf_token %}
                         {% include 'partials/form_fields.html' with form=edit_form %}
                         <div class="cw-form-footer">
-                            <button type="button" class="btn btn-cw-ghost" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-cw-orange">Guardar <i class="bi bi-arrow-right ms-1"></i></button>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-warning">Guardar <i class="bi bi-arrow-right ms-1"></i></button>
                         </div>
                     </form>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+{# ===== Per-row prices-by-vehicle-type modal ===== #}
+<div class="modal fade" id="servicePricesModal{{ service.pk }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-currency-exchange me-2"></i>Preços por tipo de veículo — {{ service.name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <form method="post" action="{% url 'services:prices_update' service.pk %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <p class="text-secondary small">Deixe em branco para usar o preço base do serviço ({{ service.price }}).</p>
+                    <div class="row g-2">
+                        {% for vt, price in price_rows %}
+                        <div class="col-6 col-md-4">
+                            <label class="form-label small mb-1">{{ vt.name }}</label>
+                            <input type="number" step="0.01" name="price_{{ vt.pk }}" value="{{ price|default_if_none:'' }}"
+                                   class="form-control form-control-sm" placeholder="{{ service.price }}">
+                        </div>
+                        {% empty %}
+                        <p class="text-muted small">Nenhum tipo de veículo cadastrado ainda.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning">Guardar preços</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

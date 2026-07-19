@@ -10,10 +10,16 @@ CW_PASSWORD = {'class': 'form-control cw-form-input'}
 
 
 class BootstrapAuthenticationForm(AuthenticationForm):
+    remember_me = forms.BooleanField(
+        label='Lembrar-me', required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['username'].widget = TextInput(attrs={'class': 'form-control'})
         self.fields['password'].widget = PasswordInput(attrs={'class': 'form-control'})
+        self.order_fields(['username', 'password', 'remember_me'])
 
 
 class UserCreateForm(UserCreationForm):

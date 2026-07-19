@@ -1,15 +1,10 @@
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LogoutView
 from django.urls import path
 
 from . import views
-from .forms import BootstrapAuthenticationForm
 
 urlpatterns = [
-    path(
-        'login/',
-        LoginView.as_view(template_name='accounts/login.html', authentication_form=BootstrapAuthenticationForm),
-        name='login',
-    ),
+    path('login/', views.CwLoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('', views.dashboard, name='dashboard'),
     path('painel-admin/', views.admin_dashboard, name='admin_dashboard'),

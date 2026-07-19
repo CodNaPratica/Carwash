@@ -6,14 +6,14 @@
 {% block mobile_header %}{% include 'partials/mobile_page_header.html' with icon='bi-bar-chart-line' title='Fechamentos' subtitle='Histórico de fechamentos' %}{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-end mb-3">
-    <button type="button" class="btn btn-cw-orange" data-bs-toggle="modal" data-bs-target="#periodClosureModal">
+    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#periodClosureModal">
         <i class="bi bi-plus-circle me-1"></i> Novo fecho semanal/mensal
     </button>
 </div>
 {# ===== Desktop: table ===== #}
-<div class="cw-card p-2 p-md-3 d-none d-md-block">
+<div class="bg-white border rounded-4 p-2 p-md-3 d-none d-md-block">
     <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
+        <table class="table table-striped table-bordered table-hover align-middle mb-0">
             <thead>
                 <tr>
                     <th>Tipo</th><th>Início</th><th>Fim</th><th>Entradas</th><th>Saídas</th>
@@ -61,7 +61,7 @@
         </div>
     </div>
     {% empty %}
-    <div class="cw-card p-4 text-center text-muted">Sem fechamentos ainda.</div>
+    <div class="bg-white border rounded-4 p-4 text-center text-muted">Sem fechamentos ainda.</div>
     {% endfor %}
 </div>
 
@@ -89,7 +89,7 @@
                 <div class="col-lg-8 cw-form-main">
                     <button type="button" class="cw-form-close" data-bs-dismiss="modal" aria-label="Fechar"><i class="bi bi-x-lg"></i></button>
                     <div class="cw-form-breadcrumb">Fechamentos <i class="bi bi-chevron-right"></i> <span>NOVO FECHO</span></div>
-                    <h4 class="cw-form-title">Fechar Caixa (Semanal/Mensal)</h4>
+                    <h4 class="fw-bold text-navy mb-4">Fechar Caixa (Semanal/Mensal)</h4>
                     <div class="cw-form-section-header">
                         <div class="cw-form-section-icon"><i class="bi bi-calendar-range"></i></div>
                         <span>Período e fundo de caixa</span>
@@ -98,8 +98,8 @@
                         {% csrf_token %}
                         {% include 'partials/form_fields.html' with form=period_form %}
                         <div class="cw-form-footer">
-                            <button type="button" class="btn btn-cw-ghost" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-cw-orange">Fechar período <i class="bi bi-arrow-right ms-1"></i></button>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-warning">Fechar período <i class="bi bi-arrow-right ms-1"></i></button>
                         </div>
                     </form>
                 </div>

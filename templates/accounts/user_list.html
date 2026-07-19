@@ -6,14 +6,14 @@
 {% block mobile_header %}{% include 'partials/mobile_page_header.html' with icon='bi-people' title='Usuários' subtitle='Gestão de contas e acessos' %}{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-end mb-3">
-    <button type="button" class="btn btn-cw-orange" data-bs-toggle="modal" data-bs-target="#createUserModal">
+    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#createUserModal">
         <i class="bi bi-plus-circle me-1"></i> Novo utilizador
     </button>
 </div>
 {# ===== Desktop: table ===== #}
-<div class="cw-card p-2 p-md-3 d-none d-md-block">
+<div class="bg-white border rounded-4 p-2 p-md-3 d-none d-md-block">
     <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
+        <table class="table table-striped table-bordered table-hover align-middle mb-0">
             <thead>
                 <tr>
                     <th>Utilizador</th>
@@ -71,7 +71,7 @@
         </div>
     </div>
     {% empty %}
-    <div class="cw-card p-4 text-center text-muted">Nenhum utilizador.</div>
+    <div class="bg-white border rounded-4 p-4 text-center text-muted">Nenhum utilizador.</div>
     {% endfor %}
 </div>
 
@@ -99,7 +99,7 @@
                 <div class="col-lg-8 cw-form-main">
                     <button type="button" class="cw-form-close" data-bs-dismiss="modal" aria-label="Fechar"><i class="bi bi-x-lg"></i></button>
                     <div class="cw-form-breadcrumb">Usuários <i class="bi bi-chevron-right"></i> <span>NOVO UTILIZADOR</span></div>
-                    <h4 class="cw-form-title">Novo Utilizador</h4>
+                    <h4 class="fw-bold text-navy mb-4">Novo Utilizador</h4>
                     <div class="cw-form-section-header">
                         <div class="cw-form-section-icon"><i class="bi bi-person"></i></div>
                         <span>Dados da conta</span>
@@ -108,8 +108,8 @@
                         {% csrf_token %}
                         {% include 'partials/form_fields.html' with form=create_form %}
                         <div class="cw-form-footer">
-                            <button type="button" class="btn btn-cw-ghost" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-cw-orange">Criar <i class="bi bi-arrow-right ms-1"></i></button>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-warning">Criar <i class="bi bi-arrow-right ms-1"></i></button>
                         </div>
                     </form>
                 </div>
@@ -144,7 +144,7 @@
                 <div class="col-lg-8 cw-form-main">
                     <button type="button" class="cw-form-close" data-bs-dismiss="modal" aria-label="Fechar"><i class="bi bi-x-lg"></i></button>
                     <div class="cw-form-breadcrumb">Usuários <i class="bi bi-chevron-right"></i> <span>EDITAR</span></div>
-                    <h4 class="cw-form-title">Editar Utilizador</h4>
+                    <h4 class="fw-bold text-navy mb-4">Editar Utilizador</h4>
                     <div class="cw-form-section-header">
                         <div class="cw-form-section-icon"><i class="bi bi-pencil"></i></div>
                         <span>Dados da conta</span>
@@ -153,8 +153,8 @@
                         {% csrf_token %}
                         {% include 'partials/form_fields.html' with form=edit_form %}
                         <div class="cw-form-footer">
-                            <button type="button" class="btn btn-cw-ghost" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-cw-orange">Guardar <i class="bi bi-arrow-right ms-1"></i></button>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-warning">Guardar <i class="bi bi-arrow-right ms-1"></i></button>
                         </div>
                     </form>
                 </div>
@@ -188,7 +188,7 @@
                 <div class="col-lg-8 cw-form-main">
                     <button type="button" class="cw-form-close" data-bs-dismiss="modal" aria-label="Fechar"><i class="bi bi-x-lg"></i></button>
                     <div class="cw-form-breadcrumb">Usuários <i class="bi bi-chevron-right"></i> <span>PASSWORD</span></div>
-                    <h4 class="cw-form-title">Definir Password de {{ u.username }}</h4>
+                    <h4 class="fw-bold text-navy mb-4">Definir Password de {{ u.username }}</h4>
                     <div class="cw-form-section-header">
                         <div class="cw-form-section-icon"><i class="bi bi-key"></i></div>
                         <span>Nova palavra-passe</span>
@@ -197,8 +197,8 @@
                         {% csrf_token %}
                         {% include 'partials/form_fields.html' with form=pw_form %}
                         <div class="cw-form-footer">
-                            <button type="button" class="btn btn-cw-ghost" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-cw-orange">Definir <i class="bi bi-arrow-right ms-1"></i></button>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-warning">Definir <i class="bi bi-arrow-right ms-1"></i></button>
                         </div>
                     </form>
                 </div>

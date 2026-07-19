@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'services',
     'vehicles',
     'cashbox',
+    'audit',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'

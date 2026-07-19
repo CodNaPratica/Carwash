@@ -1,20 +1,28 @@
 {% extends 'base.html' %}
-{% block title %}Carros - CarWash{% endblock %}
+{% block title %}Registos - CarWash{% endblock %}
 {% block page_icon %}<div class="cw-topbar-icon"><i class="bi bi-car-front"></i></div>{% endblock %}
-{% block page_title %}Carros{% endblock %}
-{% block page_subtitle %}Registo, adoção e acompanhamento dos carros a lavar{% endblock %}
-{% block mobile_header %}{% include 'partials/mobile_page_header.html' with icon='bi-car-front' title='Carros' subtitle='Registo e acompanhamento' %}{% endblock %}
+{% block page_title %}Registos{% endblock %}
+{% block page_subtitle %}Registo, adoção e acompanhamento dos veículos a lavar{% endblock %}
+{% block mobile_header %}{% include 'partials/mobile_page_header.html' with icon='bi-car-front' title='Registos' subtitle='Registo e acompanhamento' %}{% endblock %}
 {% block content %}
 
-<div class="d-flex justify-content-end mb-3">
-    <button type="button" class="btn btn-cw-orange" data-bs-toggle="modal" data-bs-target="#createVehicleModal">
-        <i class="bi bi-plus-circle me-1"></i> Registar carro
+<div class="d-flex justify-content-end gap-2 mb-3">
+    {% if user.is_admin_role %}
+    <button type="button" class="btn btn-outline-secondary position-relative" data-bs-toggle="modal" data-bs-target="#vehicleTypesModal">
+        <i class="bi bi-truck-front me-1"></i> Tipos de Veículo
+        {% if type_pending_count %}
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ type_pending_count }}</span>
+        {% endif %}
+    </button>
+    {% endif %}
+    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#createVehicleModal">
+        <i class="bi bi-plus-circle me-1"></i> Novo registo
     </button>
 </div>
 {# ===== Desktop: table ===== #}
-<div class="cw-card p-2 p-md-3 d-none d-md-block">
+<div class="bg-white border rounded-4 p-2 p-md-3 d-none d-md-block">
     <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
+        <table class="table table-striped table-bordered table-hover align-middle mb-0">
             <thead>
                 <tr>
                     <th>Matrícula</th>
@@ -29,7 +37,7 @@
             <tbody>
                 {% for entry, edit_form, trash_form in rows %}
                 <tr>
-                    <td>{{ entry.plate }}</td>
+                    <td>{{ entry.plate|default:'-' }}</td>
                     <td>{{ entry.brand }} {{ entry.model }}</td>
                     <td>{{ entry.service|default:'-' }}</td>
                     <td><span class="badge bg-secondary">{{ entry.get_status_display }}</span></td>
@@ -41,6 +49,11 @@
                         <a href="{% url 'vehicles:adopt' entry.pk %}" class="btn btn-sm btn-outline-success">Adotar</a>
                         {% endif %}
                         <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#trashModal{{ entry.pk }}">Apagar</button>
+                        {% if user.is_admin_role %}
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#historyModal{{ entry.pk }}">
+                            <i class="bi bi-clock-history"></i>
+                        </button>
+                        {% endif %}
                     </td>
                 </tr>
                 {% empty %}
@@ -57,7 +70,7 @@
     <div class="cw-row-card">
         <div class="cw-row-card-header">
             <div>
-                <div class="cw-row-card-title">{{ entry.plate }}</div>
+                <div class="cw-row-card-title">{{ entry.plate|default:"Sem matrícula" }}</div>
                 <div class="cw-row-card-subtitle">{{ entry.brand }} {{ entry.model }}</div>
             </div>
             <span class="badge bg-secondary">{{ entry.get_status_display }}</span>
@@ -88,10 +101,15 @@
             <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#trashModal{{ entry.pk }}">
                 <i class="bi bi-trash"></i> Apagar
             </button>
+            {% if user.is_admin_role %}
+            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#historyModal{{ entry.pk }}">
+                <i class="bi bi-clock-history"></i> Histórico
+            </button>
+            {% endif %}
         </div>
     </div>
     {% empty %}
-    <div class="cw-card p-4 text-center text-muted">Sem registos.</div>
+    <div class="bg-white border rounded-4 p-4 text-center text-muted">Sem registos.</div>
     {% endfor %}
 </div>
 
@@ -104,23 +122,23 @@
                 <div class="col-lg-4 cw-form-side">
                     <div class="cw-form-side-icon"><i class="bi bi-car-front-fill"></i></div>
                     <div class="cw-form-side-title">Inscrição</div>
-                    <div class="cw-form-side-subtitle">Novo carro</div>
+                    <div class="cw-form-side-subtitle">Novo registo</div>
                     <div class="cw-form-step">
                         <div class="cw-form-step-icon"><i class="bi bi-clipboard-check"></i></div>
                         <div>
-                            <div class="cw-form-step-title">Dados do Carro</div>
+                            <div class="cw-form-step-title">Dados do Veículo</div>
                             <div class="cw-form-step-subtitle">Identificação e serviço</div>
                         </div>
                     </div>
                     <div class="cw-form-tip">
                         <div class="cw-form-tip-title"><i class="bi bi-stars"></i> DICA</div>
-                        <p>O carro fica com estado "Pendente" até um segurança o adotar. A foto e o serviço são opcionais nesta etapa.</p>
+                        <p>O veículo fica com estado "Pendente" até um segurança o adotar. A foto e o serviço são opcionais nesta etapa.</p>
                     </div>
                 </div>
                 <div class="col-lg-8 cw-form-main">
                     <button type="button" class="cw-form-close" data-bs-dismiss="modal" aria-label="Fechar"><i class="bi bi-x-lg"></i></button>
-                    <div class="cw-form-breadcrumb">Carros <i class="bi bi-chevron-right"></i> <span>NOVO REGISTO</span></div>
-                    <h4 class="cw-form-title">Registo de Carro</h4>
+                    <div class="cw-form-breadcrumb">Registos <i class="bi bi-chevron-right"></i> <span>NOVO REGISTO</span></div>
+                    <h4 class="fw-bold text-navy mb-4">Novo Registo</h4>
                     <div class="cw-form-section-header">
                         <div class="cw-form-section-icon"><i class="bi bi-car-front"></i></div>
                         <span>Identificação</span>
@@ -129,8 +147,8 @@
                         {% csrf_token %}
                         {% include 'partials/form_fields.html' with form=create_form %}
                         <div class="cw-form-footer">
-                            <button type="button" class="btn btn-cw-ghost" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-cw-orange">Guardar <i class="bi bi-arrow-right ms-1"></i></button>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-warning">Guardar <i class="bi bi-arrow-right ms-1"></i></button>
                         </div>
                     </form>
                 </div>
@@ -149,7 +167,7 @@
                 <div class="col-lg-4 cw-form-side">
                     <div class="cw-form-side-icon"><i class="bi bi-pencil-square"></i></div>
                     <div class="cw-form-side-title">Edição</div>
-                    <div class="cw-form-side-subtitle">{{ entry.plate }}</div>
+                    <div class="cw-form-side-subtitle">{{ entry.plate|default:"Sem matrícula" }}</div>
                     <div class="cw-form-step">
                         <div class="cw-form-step-icon"><i class="bi bi-clock-history"></i></div>
                         <div>
@@ -164,8 +182,8 @@
                 </div>
                 <div class="col-lg-8 cw-form-main">
                     <button type="button" class="cw-form-close" data-bs-dismiss="modal" aria-label="Fechar"><i class="bi bi-x-lg"></i></button>
-                    <div class="cw-form-breadcrumb">Carros <i class="bi bi-chevron-right"></i> <span>EDITAR</span></div>
-                    <h4 class="cw-form-title">Editar Carro</h4>
+                    <div class="cw-form-breadcrumb">Registos <i class="bi bi-chevron-right"></i> <span>EDITAR</span></div>
+                    <h4 class="fw-bold text-navy mb-4">Editar Veículo</h4>
                     <div class="cw-form-section-header">
                         <div class="cw-form-section-icon"><i class="bi bi-pencil"></i></div>
                         <span>Dados e motivo da alteração</span>
@@ -174,8 +192,8 @@
                         {% csrf_token %}
                         {% include 'partials/form_fields.html' with form=edit_form %}
                         <div class="cw-form-footer">
-                            <button type="button" class="btn btn-cw-ghost" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-cw-orange">Guardar <i class="bi bi-arrow-right ms-1"></i></button>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-warning">Guardar <i class="bi bi-arrow-right ms-1"></i></button>
                         </div>
                     </form>
                 </div>
@@ -192,7 +210,7 @@
                 <div class="col-lg-4 cw-form-side">
                     <div class="cw-form-side-icon"><i class="bi bi-trash-fill"></i></div>
                     <div class="cw-form-side-title">Lixo</div>
-                    <div class="cw-form-side-subtitle">{{ entry.plate }}</div>
+                    <div class="cw-form-side-subtitle">{{ entry.plate|default:"Sem matrícula" }}</div>
                     <div class="cw-form-step">
                         <div class="cw-form-step-icon"><i class="bi bi-exclamation-triangle"></i></div>
                         <div>
@@ -207,8 +225,8 @@
                 </div>
                 <div class="col-lg-8 cw-form-main">
                     <button type="button" class="cw-form-close" data-bs-dismiss="modal" aria-label="Fechar"><i class="bi bi-x-lg"></i></button>
-                    <div class="cw-form-breadcrumb">Carros <i class="bi bi-chevron-right"></i> <span>APAGAR</span></div>
-                    <h4 class="cw-form-title">Apagar: {{ entry.brand }} {{ entry.model }} ({{ entry.plate }})</h4>
+                    <div class="cw-form-breadcrumb">Registos <i class="bi bi-chevron-right"></i> <span>APAGAR</span></div>
+                    <h4 class="fw-bold text-navy mb-4">Apagar: {{ entry.brand }} {{ entry.model }} ({{ entry.plate }})</h4>
                     <div class="cw-form-section-header">
                         <div class="cw-form-section-icon"><i class="bi bi-info-circle"></i></div>
                         <span>Motivo</span>
@@ -217,7 +235,7 @@
                         {% csrf_token %}
                         {% include 'partials/form_fields.html' with form=trash_form %}
                         <div class="cw-form-footer">
-                            <button type="button" class="btn btn-cw-ghost" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
                             <button type="submit" class="btn btn-danger rounded-pill px-4">Confirmar <i class="bi bi-trash ms-1"></i></button>
                         </div>
                     </form>
@@ -226,5 +244,85 @@
         </div>
     </div>
 </div>
+
+{% if user.is_admin_role %}
+<div class="modal fade" id="historyModal{{ entry.pk }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-clock-history me-1"></i> Histórico - {{ entry.brand }} {{ entry.model }} ({{ entry.plate }})</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-secondary small">Registado por {{ entry.registered_by.username }} em {{ entry.created_at|date:'d/m/Y H:i' }}.</p>
+                {% for log in entry.logs.all %}
+                <div class="bg-body-tertiary rounded-3 p-2 mb-2 d-flex align-items-start gap-2">
+                    <div class="cw-icon-box-sm bg-navy rounded-3 d-flex align-items-center justify-content-center text-white flex-shrink-0"><i class="bi bi-pencil"></i></div>
+                    <div>
+                        <div class="fw-semibold small">{{ log.changed_by.username }} - {{ log.created_at|date:'d/m/Y H:i' }}</div>
+                        <div class="text-secondary small">{{ log.reason }}</div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-secondary small mb-0">Sem edições registadas para este veículo.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endfor %}
+
+{% if user.is_admin_role %}
+{# ===== Tipos de Veículo: lista mestre + aprovação, aberta como painel a partir dos Registos ===== #}
+<div class="modal fade" id="vehicleTypesModal" tabindex="-1" aria-hidden="true" {% if open_types_modal %}data-autoopen="true"{% endif %}>
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-truck-front me-2"></i>Tipos de Veículo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-secondary small">Lista usada no dropdown "Tipo de Veículo" do registo e do pagamento. Tipos criados aqui já ficam aprovados; os que a segurança/tesoureira adicionam via "Outro" aparecem pendentes até serem aprovados.</p>
+
+                <form method="post" action="{% url 'vehicles:type_create' %}" class="d-flex gap-2 align-items-start mb-3">
+                    {% csrf_token %}
+                    <div class="flex-grow-1">
+                        {{ type_create_form.name }}
+                        {% if type_create_form.name.errors %}<div class="text-danger small mt-1">{{ type_create_form.name.errors }}</div>{% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-warning flex-shrink-0"><i class="bi bi-plus-lg me-1"></i>Adicionar</button>
+                </form>
+
+                <div class="list-group">
+                    {% for vt in vehicle_types %}
+                    <div class="list-group-item d-flex align-items-center gap-2">
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold small">{{ vt.name }}</div>
+                            {% if vt.added_by %}<div class="text-secondary small">Adicionado por {{ vt.added_by }}</div>{% endif %}
+                        </div>
+                        {% if vt.is_approved %}
+                        <span class="badge bg-success">Aprovado</span>
+                        {% else %}
+                        <span class="badge bg-warning text-dark">Pendente</span>
+                        <form method="post" action="{% url 'vehicles:type_approve' vt.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-check2"></i> Aprovar</button>
+                        </form>
+                        {% endif %}
+                        <form method="post" action="{% url 'vehicles:type_delete' vt.pk %}"
+                              onsubmit="return confirm('Apagar o tipo \'{{ vt.name|escapejs }}\'? Registos que o usam ficam sem tipo definido.');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </div>
+                    {% empty %}
+                    <div class="text-center text-muted small py-3">Nenhum tipo de veículo cadastrado.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

@@ -4,6 +4,22 @@ from django.db import models
 from services.models import Service
 
 
+class VehicleType(models.Model):
+    name = models.CharField('Tipo de veículo', max_length=50, unique=True)
+    is_approved = models.BooleanField('Aprovado', default=True)
+    added_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, verbose_name='Adicionado por', on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='vehicle_types_added'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
 class VehicleEntry(models.Model):
     class Status(models.TextChoices):
         PENDENTE = 'pendente', 'Pendente'
@@ -11,8 +27,13 @@ class VehicleEntry(models.Model):
         CONCLUIDO = 'concluido', 'Concluído'
 
     brand = models.CharField('Marca', max_length=50)
-    model = models.CharField('Modelo', max_length=50)
-    plate = models.CharField('Matrícula', max_length=20)
+    model = models.ForeignKey(
+        VehicleType, verbose_name='Tipo de Veículo', on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='vehicle_entries'
+    )
+    plate = models.CharField('Matrícula', max_length=20, blank=True)
+    no_plate = models.BooleanField('Sem matrícula', default=False)
+    alt_identifier = models.CharField('Chassis / Descrição', max_length=100, blank=True)
     photo = models.ImageField('Foto', upload_to='vehicles/', blank=True, null=True)
     service = models.ForeignKey(
         Service, verbose_name='Serviço', on_delete=models.SET_NULL, null=True, blank=True
@@ -45,7 +66,11 @@ class VehicleEntry(models.Model):
         verbose_name_plural = 'Vehicle entries'
 
     def __str__(self):
-        return f'{self.brand} {self.model} - {self.plate}'
+        if self.plate:
+            return f'{self.brand} {self.model} - {self.plate}'
+        if self.no_plate and self.alt_identifier:
+            return f'{self.brand} {self.model} - {self.alt_identifier}'
+        return f'{self.brand} {self.model}'
 
 
 class VehicleEntryLog(models.Model):

@@ -2,5 +2,5 @@
     {% csrf_token %}
     <input type="hidden" name="form_type" value="profile">
     {% include 'partials/form_fields.html' with form=profile_form %}
-    <button type="submit" class="btn btn-cw-orange">Guardar dados</button>
+    <button type="submit" class="btn btn-warning">Guardar dados</button>
 </form>

@@ -3,16 +3,18 @@
 {% block content %}
 
 {# ===== Mobile: gradient hero + rounded bottom sheet ===== #}
-<div class="cw-login-mobile d-lg-none">
-    <div class="cw-login-mobile-hero">
-        <div class="cw-login-mobile-logo"><i class="bi bi-droplet-half"></i></div>
-        <div class="cw-login-mobile-name">CarWash</div>
-        <div class="cw-login-mobile-tagline">GESTÃO INTELIGENTE</div>
-        <div class="cw-login-mobile-sub">Sistema completo para a sua lavagem de automóveis</div>
+<div class="min-vh-100 d-flex flex-column d-lg-none">
+    <div class="bg-navy bg-gradient text-white text-center px-4 pt-5 pb-5">
+        <div class="bg-white rounded-4 d-flex align-items-center justify-content-center mx-auto mb-3 shadow" style="width: 84px; height: 84px;">
+            <i class="bi bi-droplet-half text-navy fs-1"></i>
+        </div>
+        <div class="fw-bold fs-2">CarWash</div>
+        <div class="text-orange fw-bold small text-uppercase mt-1">Gestão inteligente</div>
+        <div class="text-white-50 small mt-2">Sistema completo para a sua lavagem de automóveis</div>
     </div>
-    <div class="cw-login-mobile-sheet">
-        <div class="cw-login-mobile-handle"></div>
-        <h3 class="fw-bold" style="color: var(--cw-navy);">Bem-vindo de volta</h3>
+    <div class="bg-white rounded-top-4 p-4 pb-5 flex-grow-1" style="margin-top: -1.5rem;">
+        <div class="bg-secondary-subtle rounded-pill mx-auto mb-4" style="width: 42px; height: 4px;"></div>
+        <h3 class="fw-bold text-navy">Bem-vindo de volta</h3>
         <p class="text-muted mb-4">Entre com as suas credenciais</p>
 
         {% if form.errors %}
@@ -23,19 +25,23 @@
             {% csrf_token %}
             <div class="mb-3">
                 <label class="form-label fw-semibold">Nome de utilizador</label>
-                <div class="input-group cw-input-group-soft">
+                <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-person"></i></span>
                     {{ form.username }}
                 </div>
             </div>
             <div class="mb-2">
                 <label class="form-label fw-semibold">Palavra-passe</label>
-                <div class="input-group cw-input-group-soft">
+                <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-lock"></i></span>
                     {{ form.password }}
                 </div>
             </div>
-            <button type="submit" class="btn btn-cw-orange w-100 mt-3">
+            <div class="form-check mb-2">
+                {{ form.remember_me }}
+                <label class="form-check-label" for="{{ form.remember_me.id_for_label }}">Lembrar-me</label>
+            </div>
+            <button type="submit" class="btn btn-warning w-100 mt-3">
                 Entrar <i class="bi bi-arrow-right ms-1"></i>
             </button>
         </form>
@@ -45,22 +51,22 @@
 </div>
 
 {# ===== Desktop: split card ===== #}
-<div class="cw-login-wrapper d-none d-lg-flex">
-    <div class="card cw-login-card border-0">
+<div class="min-vh-100 align-items-center justify-content-center d-none d-lg-flex">
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden mx-auto" style="max-width: 900px;">
         <div class="row g-0">
-            <div class="col-md-5 cw-login-side">
-                <div class="cw-login-logo">
-                    <i class="bi bi-droplet-half"></i>
+            <div class="col-md-5 bg-navy bg-gradient text-white p-5">
+                <div class="bg-white rounded-4 d-flex align-items-center justify-content-center mb-4" style="width: 84px; height: 84px;">
+                    <i class="bi bi-droplet-half text-navy fs-1"></i>
                 </div>
-                <div class="cw-brand-name">CarWash</div>
-                <div class="cw-brand-tagline">Gestão inteligente</div>
-                <div class="cw-divider"><span></span></div>
-                <p class="mb-0" style="color: rgba(255,255,255,.8);">
-                    Sistema de gestão completo para a lavagem: registo de carros, caixa e fechamentos, tudo num só lugar.
+                <div class="fw-bold fs-1 mb-1">CarWash</div>
+                <div class="text-orange fw-bold text-uppercase small">Gestão inteligente</div>
+                <hr class="my-4 border-white-50">
+                <p class="mb-0 text-white-50">
+                    Sistema de gestão completo para a lavagem: registo de veículos, caixa e fechamentos, tudo num só lugar.
                 </p>
             </div>
-            <div class="col-md-7 cw-login-form-side">
-                <h2 class="fw-bold" style="color: var(--cw-navy);">Bem-vindo</h2>
+            <div class="col-md-7 bg-white p-5">
+                <h2 class="fw-bold text-navy">Bem-vindo</h2>
                 <p class="text-muted mb-4">Entre com as suas credenciais</p>
 
                 {% if form.errors %}
@@ -71,24 +77,28 @@
                     {% csrf_token %}
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Nome de utilizador</label>
-                        <div class="input-group cw-input-group">
+                        <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-person"></i></span>
                             {{ form.username }}
                         </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Palavra-passe</label>
-                        <div class="input-group cw-input-group">
+                        <div class="input-group">
                             <span class="input-group-text"><i class="bi bi-lock"></i></span>
                             {{ form.password }}
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-cw-orange w-100 mt-2">
+                    <div class="form-check mb-3">
+                        {{ form.remember_me }}
+                        <label class="form-check-label" for="{{ form.remember_me.id_for_label }}">Lembrar-me</label>
+                    </div>
+                    <button type="submit" class="btn btn-warning w-100 mt-2">
                         Entrar <i class="bi bi-arrow-right ms-1"></i>
                     </button>
                 </form>
 
-                <div class="cw-divider"><span></span></div>
+                <hr class="my-4">
                 <p class="text-center text-muted small mb-0">Sistema exclusivo para a equipa CarWash</p>
             </div>
         </div>

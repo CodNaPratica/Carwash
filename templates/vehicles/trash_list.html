@@ -2,13 +2,13 @@
 {% block title %}Lixo - CarWash{% endblock %}
 {% block page_icon %}<div class="cw-topbar-icon"><i class="bi bi-trash"></i></div>{% endblock %}
 {% block page_title %}Lixo{% endblock %}
-{% block page_subtitle %}Registos apagados - só consulta e auditoria{% endblock %}
-{% block mobile_header %}{% include 'partials/mobile_page_header.html' with icon='bi-trash' title='Lixo' subtitle='Registos apagados - só consulta e auditoria' %}{% endblock %}
+{% block page_subtitle %}Registos apagados - auditoria, restauro e eliminação definitiva{% endblock %}
+{% block mobile_header %}{% include 'partials/mobile_page_header.html' with icon='bi-trash' title='Lixo' subtitle='Auditoria, restauro e eliminação definitiva' %}{% endblock %}
 {% block content %}
 {# ===== Desktop: table ===== #}
-<div class="cw-card p-2 p-md-3 d-none d-md-block">
+<div class="bg-white border rounded-4 p-2 p-md-3 d-none d-md-block">
     <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
+        <table class="table table-striped table-bordered table-hover align-middle mb-0">
             <thead>
                 <tr>
                     <th>Matrícula</th>
@@ -22,7 +22,7 @@
             <tbody>
                 {% for entry in entries %}
                 <tr>
-                    <td>{{ entry.plate }}</td>
+                    <td>{{ entry.plate|default:'-' }}</td>
                     <td>{{ entry.brand }} {{ entry.model }}</td>
                     <td>{{ entry.trashed_by.username|default:'-' }}</td>
                     <td>{{ entry.trashed_at|date:'d/m/Y H:i' }}</td>
@@ -30,6 +30,12 @@
                     <td>
                         <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#detailModal{{ entry.pk }}">
                             <i class="bi bi-eye"></i> Ver detalhes
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#restoreModal{{ entry.pk }}">
+                            <i class="bi bi-arrow-counterclockwise"></i> Restaurar
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#permDeleteModal{{ entry.pk }}">
+                            <i class="bi bi-trash3"></i> Apagar definitivo
                         </button>
                     </td>
                 </tr>
@@ -47,7 +53,7 @@
     <div class="cw-row-card">
         <div class="cw-row-card-header">
             <div>
-                <div class="cw-row-card-title">{{ entry.plate }}</div>
+                <div class="cw-row-card-title">{{ entry.plate|default:"Sem matrícula" }}</div>
                 <div class="cw-row-card-subtitle">{{ entry.brand }} {{ entry.model }}</div>
             </div>
         </div>
@@ -69,10 +75,16 @@
             <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#detailModal{{ entry.pk }}">
                 <i class="bi bi-eye"></i> Ver detalhes
             </button>
+            <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#restoreModal{{ entry.pk }}">
+                <i class="bi bi-arrow-counterclockwise"></i> Restaurar
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#permDeleteModal{{ entry.pk }}">
+                <i class="bi bi-trash3"></i> Apagar definitivo
+            </button>
         </div>
     </div>
     {% empty %}
-    <div class="cw-card p-4 text-center text-muted">Lixo vazio.</div>
+    <div class="bg-white border rounded-4 p-4 text-center text-muted">Lixo vazio.</div>
     {% endfor %}
 </div>
 
@@ -84,10 +96,10 @@
                 <div class="col-lg-4 cw-form-side">
                     <div class="cw-form-side-icon"><i class="bi bi-trash-fill"></i></div>
                     <div class="cw-form-side-title">Auditoria</div>
-                    <div class="cw-form-side-subtitle">{{ entry.plate }}</div>
+                    <div class="cw-form-side-subtitle">{{ entry.plate|default:"Sem matrícula" }}</div>
                     {% if entry.photo %}
                     <div class="cw-form-step p-2">
-                        <img src="{{ entry.photo.url }}" alt="Foto do carro" class="img-fluid rounded" style="max-height: 160px; object-fit: cover; width: 100%;">
+                        <img src="{{ entry.photo.url }}" alt="Foto do veículo" class="img-fluid rounded" style="max-height: 160px; object-fit: cover; width: 100%;">
                     </div>
                     {% endif %}
                     <div class="cw-form-tip">
@@ -98,19 +110,19 @@
                 <div class="col-lg-8 cw-form-main">
                     <button type="button" class="cw-form-close" data-bs-dismiss="modal" aria-label="Fechar"><i class="bi bi-x-lg"></i></button>
                     <div class="cw-form-breadcrumb">Lixo <i class="bi bi-chevron-right"></i> <span>DETALHES</span></div>
-                    <h4 class="cw-form-title">{{ entry.brand }} {{ entry.model }} ({{ entry.plate }})</h4>
+                    <h4 class="fw-bold text-navy mb-4">{{ entry.brand }} {{ entry.model }} ({{ entry.plate }})</h4>
 
                     <div class="cw-form-section-header">
                         <div class="cw-form-section-icon"><i class="bi bi-info-circle"></i></div>
                         <span>Dados do registo</span>
                     </div>
                     <div class="row g-3 mb-4">
-                        <div class="col-6"><div class="cw-finance-label">Serviço</div><div class="fw-semibold">{{ entry.service|default:'-' }}</div></div>
-                        <div class="col-6"><div class="cw-finance-label">Estado antes de apagar</div><div class="fw-semibold">{{ entry.get_status_display }}</div></div>
-                        <div class="col-6"><div class="cw-finance-label">Registado por</div><div class="fw-semibold">{{ entry.registered_by.username }} em {{ entry.created_at|date:'d/m/Y H:i' }}</div></div>
-                        <div class="col-6"><div class="cw-finance-label">Adotado por</div><div class="fw-semibold">{{ entry.claimed_by.username|default:'-' }}{% if entry.claimed_at %} em {{ entry.claimed_at|date:'d/m/Y H:i' }}{% endif %}</div></div>
-                        <div class="col-6"><div class="cw-finance-label">Apagado por</div><div class="fw-semibold">{{ entry.trashed_by.username|default:'-' }}</div></div>
-                        <div class="col-6"><div class="cw-finance-label">Apagado em</div><div class="fw-semibold">{{ entry.trashed_at|date:'d/m/Y H:i' }}</div></div>
+                        <div class="col-6"><div class="text-secondary small">Serviço</div><div class="fw-semibold">{{ entry.service|default:'-' }}</div></div>
+                        <div class="col-6"><div class="text-secondary small">Estado antes de apagar</div><div class="fw-semibold">{{ entry.get_status_display }}</div></div>
+                        <div class="col-6"><div class="text-secondary small">Registado por</div><div class="fw-semibold">{{ entry.registered_by.username }} em {{ entry.created_at|date:'d/m/Y H:i' }}</div></div>
+                        <div class="col-6"><div class="text-secondary small">Adotado por</div><div class="fw-semibold">{{ entry.claimed_by.username|default:'-' }}{% if entry.claimed_at %} em {{ entry.claimed_at|date:'d/m/Y H:i' }}{% endif %}</div></div>
+                        <div class="col-6"><div class="text-secondary small">Apagado por</div><div class="fw-semibold">{{ entry.trashed_by.username|default:'-' }}</div></div>
+                        <div class="col-6"><div class="text-secondary small">Apagado em</div><div class="fw-semibold">{{ entry.trashed_at|date:'d/m/Y H:i' }}</div></div>
                     </div>
 
                     <div class="cw-form-section-header">
@@ -118,18 +130,64 @@
                         <span>Histórico de edições</span>
                     </div>
                     {% for log in entry.logs.all %}
-                    <div class="cw-finance-box mb-2" style="align-items: flex-start;">
-                        <div class="cw-stat-icon bg-navy" style="width:32px;height:32px;font-size:.9rem;"><i class="bi bi-pencil"></i></div>
+                    <div class="bg-body-tertiary rounded-3 p-2 mb-2 d-flex align-items-start gap-2">
+                        <div class="cw-icon-box-sm bg-navy rounded-3 d-flex align-items-center justify-content-center text-white flex-shrink-0"><i class="bi bi-pencil"></i></div>
                         <div>
                             <div class="fw-semibold small">{{ log.changed_by.username }} - {{ log.created_at|date:'d/m/Y H:i' }}</div>
                             <div class="text-muted small">{{ log.reason }}</div>
                         </div>
                     </div>
                     {% empty %}
-                    <p class="text-muted small">Sem edições registadas para este carro.</p>
+                    <p class="text-muted small">Sem edições registadas para este veículo.</p>
                     {% endfor %}
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+{# ===== Restore confirmation ===== #}
+<div class="modal fade" id="restoreModal{{ entry.pk }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-arrow-counterclockwise text-success me-1"></i> Restaurar registo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <p>Restaurar <strong>{{ entry.brand }} {{ entry.model }} ({{ entry.plate }})</strong> de volta ao fluxo normal de registos?</p>
+                <p class="text-secondary small mb-0">Esta ação fica registada no histórico de edições do registo.</p>
+            </div>
+            <form method="post" action="{% url 'vehicles:restore' entry.pk %}">
+                {% csrf_token %}
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Restaurar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{# ===== Permanent delete confirmation ===== #}
+<div class="modal fade" id="permDeleteModal{{ entry.pk }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger"><i class="bi bi-exclamation-triangle me-1"></i> Apagar definitivamente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <p>Apagar <strong>{{ entry.brand }} {{ entry.model }} ({{ entry.plate }})</strong> definitivamente da base de dados?</p>
+                <p class="text-danger small mb-0"><strong>Esta ação não pode ser desfeita</strong> — o registo e o seu histórico de edições serão removidos para sempre.</p>
+            </div>
+            <form method="post" action="{% url 'vehicles:permanent_delete' entry.pk %}">
+                {% csrf_token %}
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Apagar definitivamente</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

@@ -8,13 +8,14 @@ from accounts.decorators import role_required
 
 from .forms import CashMovementForm, PaymentForm, PeriodClosureForm
 from .models import CashClosure, CashMovement, Payment
-from .services import get_unclosed_previous_day, last_closure, totals_for_range
+from .services import get_unclosed_previous_day, last_closure, movement_breakdown, totals_for_range
 
 
-def _dashboard_context(**overrides):
+def _dashboard_context(user, **overrides):
     today = timezone.localdate()
     unclosed_day = get_unclosed_previous_day()
     total_in, total_out = totals_for_range(today, today)
+    total_custo, total_despesa = movement_breakdown(today, today)
     unclosed_total_in = unclosed_total_out = None
     if unclosed_day:
         unclosed_total_in, unclosed_total_out = totals_for_range(unclosed_day, unclosed_day)
@@ -27,13 +28,15 @@ def _dashboard_context(**overrides):
         'unclosed_balance': (unclosed_total_in - unclosed_total_out) if unclosed_day else None,
         'total_in': total_in,
         'total_out': total_out,
+        'total_custo': total_custo,
+        'total_despesa': total_despesa,
         'balance': total_in - total_out,
         'payments': Payment.objects.filter(created_at__date=today),
         'movements': CashMovement.objects.filter(created_at__date=today),
         'today_closed': CashClosure.objects.filter(
             period_type=CashClosure.PeriodType.DIARIO, date_start=today
         ).exists(),
-        'payment_form': PaymentForm(),
+        'payment_form': PaymentForm(user=user),
         'movement_form': CashMovementForm(),
         'open_payment_modal': False,
         'open_movement_modal': False,
@@ -46,9 +49,12 @@ def _dashboard_context(**overrides):
 def home(request):
     today = timezone.localdate()
     total_in, total_out = totals_for_range(today, today)
+    total_custo, total_despesa = movement_breakdown(today, today)
     return render(request, 'cashbox/home.html', {
         'total_in': total_in,
         'total_out': total_out,
+        'total_custo': total_custo,
+        'total_despesa': total_despesa,
         'balance': total_in - total_out,
         'payments': Payment.objects.filter(created_at__date=today),
         'movements': CashMovement.objects.filter(created_at__date=today),
@@ -63,7 +69,7 @@ def dashboard(request):
         overrides['open_payment_modal'] = True
     elif open_param == 'movement':
         overrides['open_movement_modal'] = True
-    return render(request, 'cashbox/dashboard.html', _dashboard_context(**overrides))
+    return render(request, 'cashbox/dashboard.html', _dashboard_context(request.user, **overrides))
 
 
 @role_required('tesoureira')
@@ -73,14 +79,14 @@ def payment_create(request):
         messages.error(request, f'Feche primeiro o caixa do dia {unclosed_day} antes de registar novos valores.')
         return redirect('cashbox:dashboard')
     if request.method == 'POST':
-        form = PaymentForm(request.POST)
+        form = PaymentForm(request.POST, user=request.user)
         if form.is_valid():
             payment = form.save(commit=False)
             payment.received_by = request.user
             payment.save()
             messages.success(request, 'Pagamento registado.')
             return redirect('cashbox:dashboard')
-        return render(request, 'cashbox/dashboard.html', _dashboard_context(payment_form=form, open_payment_modal=True))
+        return render(request, 'cashbox/dashboard.html', _dashboard_context(request.user, payment_form=form, open_payment_modal=True))
     return redirect('cashbox:dashboard')
 
 
@@ -98,7 +104,7 @@ def movement_create(request):
             movement.save()
             messages.success(request, 'Movimento registado.')
             return redirect('cashbox:dashboard')
-        return render(request, 'cashbox/dashboard.html', _dashboard_context(movement_form=form, open_movement_modal=True))
+        return render(request, 'cashbox/dashboard.html', _dashboard_context(request.user, movement_form=form, open_movement_modal=True))
     return redirect('cashbox:dashboard')
 
 
