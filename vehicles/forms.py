@@ -7,7 +7,6 @@ BOOTSTRAP_WIDGETS = {
     'brand': forms.TextInput(attrs={'class': 'form-control cw-form-input'}),
     'plate': forms.TextInput(attrs={'class': 'form-control cw-form-input cw-plate-input'}),
     'no_plate': forms.CheckboxInput(attrs={'class': 'form-check-input cw-no-plate-toggle'}),
-    'alt_identifier': forms.TextInput(attrs={'class': 'form-control cw-form-input'}),
     'photo': forms.ClearableFileInput(attrs={'class': 'form-control cw-form-input'}),
     'service': forms.Select(attrs={'class': 'form-select cw-form-input'}),
 }
@@ -86,12 +85,8 @@ class PlateValidationMixin:
         cleaned_data = super().clean()
         no_plate = cleaned_data.get('no_plate')
         plate = cleaned_data.get('plate')
-        alt_identifier = cleaned_data.get('alt_identifier')
 
-        if no_plate:
-            if not alt_identifier:
-                self.add_error('alt_identifier', 'Informe o chassis ou uma descrição do veículo.')
-        elif not plate:
+        if not no_plate and not plate:
             self.add_error('plate', 'A matrícula é obrigatória, a menos que marque "Sem matrícula".')
 
         return cleaned_data
@@ -100,7 +95,7 @@ class PlateValidationMixin:
 class VehicleEntryForm(PlateValidationMixin, VehicleTypeFieldMixin, forms.ModelForm):
     class Meta:
         model = VehicleEntry
-        fields = ['brand', 'model', 'plate', 'no_plate', 'alt_identifier', 'photo', 'service']
+        fields = ['brand', 'model', 'plate', 'no_plate', 'photo', 'service']
         widgets = BOOTSTRAP_WIDGETS
 
 
@@ -112,7 +107,7 @@ class VehicleEntryEditForm(PlateValidationMixin, VehicleTypeFieldMixin, forms.Mo
 
     class Meta:
         model = VehicleEntry
-        fields = ['brand', 'model', 'plate', 'no_plate', 'alt_identifier', 'photo', 'service']
+        fields = ['brand', 'model', 'plate', 'no_plate', 'photo', 'service']
         widgets = BOOTSTRAP_WIDGETS
 
 

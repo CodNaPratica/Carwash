@@ -47,7 +47,7 @@
             <tbody>
                 {% for p in payments %}
                 <tr>
-                    <td>{{ p.brand }} {{ p.model }} — {{ p.plate|default:p.alt_identifier }}</td>
+                    <td>{{ p.brand }} {{ p.model }} — {{ p.plate|default:'Sem matrícula' }}</td>
                     <td>{{ p.service }}</td>
                     <td>{{ p.amount }}</td>
                     <td>{{ p.received_by.username }}</td>
@@ -71,7 +71,7 @@
         <div class="cw-row-card-grid">
             <div class="cw-row-card-field" style="grid-column: span 2;">
                 <div class="cw-row-card-label">Veículo</div>
-                <div class="cw-row-card-value">{{ p.brand }} {{ p.model }} — {{ p.plate|default:p.alt_identifier }}</div>
+                <div class="cw-row-card-value">{{ p.brand }} {{ p.model }} — {{ p.plate|default:'Sem matrícula' }}</div>
             </div>
         </div>
     </div>
@@ -183,7 +183,6 @@
                             {{ payment_form.no_plate }}
                             <label class="form-check-label" for="{{ payment_form.no_plate.id_for_label }}">Sem matrícula</label>
                         </div>
-                        {% include 'partials/field.html' with field=payment_form.alt_identifier %}
 
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Serviço <span class="text-danger">*</span></label>

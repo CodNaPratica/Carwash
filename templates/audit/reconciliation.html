@@ -53,51 +53,51 @@
     </div>
 </div>
 
-<h6 class="fw-bold mb-3 text-navy">Casos</h6>
-
-{# ===== Desktop: table ===== #}
-<div class="bg-white border rounded-4 p-2 p-md-3 mb-4 d-none d-md-block">
+{# ===== Desktop: card with table ===== #}
+<div class="card border-0 shadow-sm mb-4 d-none d-md-block">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+        <h6 class="fw-bold text-navy mb-0">Casos</h6>
+        {% if cases %}<span class="text-secondary small">{{ cases|length }} caso{{ cases|length|pluralize }}</span>{% endif %}
+    </div>
     <div class="table-responsive">
-        <table class="table table-striped table-bordered table-hover align-middle mb-0">
-            <thead>
+        <table class="table table-hover align-middle small mb-0">
+            <thead class="table-light">
                 <tr>
                     <th>Segurança</th>
                     <th>Tesoureira</th>
                     <th>Valores</th>
                     <th>Estado</th>
-                    <th>Investigação</th>
-                    <th>Ações</th>
+                    <th class="text-end">Detalhes</th>
                 </tr>
             </thead>
             <tbody>
                 {% for case in cases %}
                 <tr>
-                    <td>
+                    <td class="text-nowrap">
                         {% if case.vehicle_entry %}
-                        <div class="fw-semibold">{{ case.vehicle_entry.brand }} {{ case.vehicle_entry.model }} — {{ case.vehicle_entry.plate|default:case.vehicle_entry.alt_identifier }}</div>
-                        <div class="text-secondary small">{{ case.vehicle_entry.service|default:'-' }} · {{ case.vehicle_entry.created_at|date:'H:i' }}</div>
+                        {{ case.vehicle_entry.brand }} {{ case.vehicle_entry.model }} — {{ case.vehicle_entry.plate|default:'Sem matrícula' }}
+                        <span class="text-secondary">· {{ case.vehicle_entry.service|default:'-' }} · {{ case.vehicle_entry.created_at|date:'H:i' }}</span>
                         {% else %}
-                        <span class="text-secondary small">— sem registo —</span>
+                        <span class="text-secondary">— sem registo —</span>
                         {% endif %}
                     </td>
-                    <td>
+                    <td class="text-nowrap">
                         {% if case.payment %}
-                        <div class="fw-semibold">{{ case.payment.brand }} {{ case.payment.model }} — {{ case.payment.plate|default:case.payment.alt_identifier }}</div>
-                        <div class="text-secondary small">{{ case.payment.service }} · {{ case.payment.get_payment_method_display }} · {{ case.payment.created_at|date:'H:i' }}</div>
+                        {{ case.payment.brand }} {{ case.payment.model }} — {{ case.payment.plate|default:'Sem matrícula' }}
+                        <span class="text-secondary">· {{ case.payment.get_payment_method_display }} · {{ case.payment.created_at|date:'H:i' }}</span>
                         {% else %}
-                        <span class="text-secondary small">— sem registo —</span>
+                        <span class="text-secondary">— sem registo —</span>
                         {% endif %}
                     </td>
-                    <td>
+                    <td class="text-nowrap">
                         {% if case.payment %}
-                        <div class="small">Cobrado: {{ case.payment.price_charged }}</div>
-                        <div class="small">Recebido: {{ case.payment.amount }}</div>
-                        {% endif %}
-                        {% if case.status == 'value_mismatch' %}
-                        <div class="text-danger small fw-semibold">Diferença: {{ case.value_difference }}</div>
+                        <span class="text-secondary">Cobrado</span> {{ case.payment.price_charged }}
+                        <span class="text-secondary">· Recebido</span>
+                        <span class="{% if case.status == 'value_mismatch' %}text-danger fw-semibold{% endif %}">{{ case.payment.amount }}</span>
+                        {% if case.status == 'value_mismatch' %}<span class="text-danger">(dif. {{ case.value_difference }})</span>{% endif %}
                         {% endif %}
                     </td>
-                    <td>
+                    <td class="text-nowrap">
                         {% if case.status == 'ok' %}
                         <span class="badge bg-success">{{ case.get_status_display }}</span>
                         {% elif case.status == 'service_mismatch' or case.status == 'value_mismatch' %}
@@ -107,27 +107,16 @@
                         {% else %}
                         <span class="badge bg-secondary">{{ case.get_status_display }}</span>
                         {% endif %}
+                        {% if case.is_reviewed %}<i class="bi bi-check-circle-fill text-success ms-1" title="Já revisto por {{ case.reviewed_by.username }}"></i>{% endif %}
                     </td>
-                    <td>
-                        {% if case.is_reviewed %}
-                        <div class="small fw-semibold">{{ case.get_investigation_status_display }}</div>
-                        <div class="text-secondary small">{{ case.reviewed_by.username|default:'-' }} · {{ case.reviewed_at|date:'d/m/Y H:i' }}{% if case.review_note %}<br>{{ case.review_note }}{% endif %}</div>
-                        {% else %}
-                        <span class="text-secondary small">—</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-sm {% if case.status == 'ok' %}btn-outline-success{% else %}btn-outline-primary{% endif %}" data-bs-toggle="modal" data-bs-target="#investigateModal{{ case.pk }}">
-                            {% if case.is_reviewed %}
-                                <i class="bi bi-pencil"></i> {% if case.status == 'ok' %}Editar confirmação{% else %}Editar investigação{% endif %}
-                            {% else %}
-                                {% if case.status == 'ok' %}<i class="bi bi-check2-circle"></i> Confirmar{% else %}<i class="bi bi-search"></i> Investigar{% endif %}
-                            {% endif %}
+                    <td class="text-end">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#investigateModal{{ case.pk }}" title="Ver detalhes e investigação">
+                            <i class="bi bi-eye"></i>
                         </button>
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="6" class="text-center text-muted py-4">Sem registos para este dia.</td></tr>
+                <tr><td colspan="5" class="text-center text-muted py-4">Sem registos para este dia.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -153,29 +142,20 @@
             <div class="cw-row-card-field" style="grid-column: span 2;">
                 <div class="cw-row-card-label">Segurança</div>
                 <div class="cw-row-card-value">
-                    {% if case.vehicle_entry %}{{ case.vehicle_entry.brand }} {{ case.vehicle_entry.model }} — {{ case.vehicle_entry.plate|default:case.vehicle_entry.alt_identifier }} · {{ case.vehicle_entry.service|default:'-' }}{% else %}— sem registo —{% endif %}
+                    {% if case.vehicle_entry %}{{ case.vehicle_entry.brand }} {{ case.vehicle_entry.model }} — {{ case.vehicle_entry.plate|default:'Sem matrícula' }} · {{ case.vehicle_entry.service|default:'-' }}{% else %}— sem registo —{% endif %}
                 </div>
             </div>
             <div class="cw-row-card-field" style="grid-column: span 2;">
                 <div class="cw-row-card-label">Tesoureira</div>
                 <div class="cw-row-card-value">
-                    {% if case.payment %}{{ case.payment.brand }} {{ case.payment.model }} — {{ case.payment.plate|default:case.payment.alt_identifier }} · Cobrado {{ case.payment.price_charged }} · Recebido {{ case.payment.amount }}{% else %}— sem registo —{% endif %}
+                    {% if case.payment %}{{ case.payment.brand }} {{ case.payment.model }} — {{ case.payment.plate|default:'Sem matrícula' }} · Cobrado {{ case.payment.price_charged }} · Recebido {{ case.payment.amount }}{% else %}— sem registo —{% endif %}
                 </div>
             </div>
-            {% if case.is_reviewed %}
-            <div class="cw-row-card-field" style="grid-column: span 2;">
-                <div class="cw-row-card-label">Investigação</div>
-                <div class="cw-row-card-value">{{ case.get_investigation_status_display }} — {{ case.reviewed_by.username|default:'-' }}{% if case.review_note %}: {{ case.review_note }}{% endif %}</div>
-            </div>
-            {% endif %}
         </div>
         <div class="cw-row-card-actions">
-            <button type="button" class="btn btn-sm {% if case.status == 'ok' %}btn-outline-success{% else %}btn-outline-primary{% endif %}" data-bs-toggle="modal" data-bs-target="#investigateModal{{ case.pk }}">
-                {% if case.is_reviewed %}
-                    <i class="bi bi-pencil"></i> {% if case.status == 'ok' %}Editar confirmação{% else %}Editar investigação{% endif %}
-                {% else %}
-                    {% if case.status == 'ok' %}<i class="bi bi-check2-circle"></i> Confirmar{% else %}<i class="bi bi-search"></i> Investigar{% endif %}
-                {% endif %}
+            {% if case.is_reviewed %}<span class="small text-success me-auto"><i class="bi bi-check-circle-fill"></i> Revisto</span>{% endif %}
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#investigateModal{{ case.pk }}">
+                <i class="bi bi-eye"></i> Ver detalhes
             </button>
         </div>
     </div>
@@ -221,7 +201,7 @@
                                     <span class="text-secondary small fw-semibold text-uppercase">Segurança</span>
                                 </div>
                                 {% if case.vehicle_entry %}
-                                <div class="fw-semibold">{{ case.vehicle_entry.brand }} {{ case.vehicle_entry.model }} — {{ case.vehicle_entry.plate|default:case.vehicle_entry.alt_identifier }}</div>
+                                <div class="fw-semibold">{{ case.vehicle_entry.brand }} {{ case.vehicle_entry.model }} — {{ case.vehicle_entry.plate|default:'Sem matrícula' }}</div>
                                 <div class="text-secondary small">{{ case.vehicle_entry.service|default:'-' }} · {{ case.vehicle_entry.created_at|date:'d/m/Y H:i' }}</div>
                                 <div class="text-secondary small">Registado por {{ case.vehicle_entry.registered_by.username }}</div>
                                 {% else %}
@@ -236,7 +216,7 @@
                                     <span class="text-secondary small fw-semibold text-uppercase">Tesoureira</span>
                                 </div>
                                 {% if case.payment %}
-                                <div class="fw-semibold">{{ case.payment.brand }} {{ case.payment.model }} — {{ case.payment.plate|default:case.payment.alt_identifier }}</div>
+                                <div class="fw-semibold">{{ case.payment.brand }} {{ case.payment.model }} — {{ case.payment.plate|default:'Sem matrícula' }}</div>
                                 <div class="text-secondary small">{{ case.payment.service }} · {{ case.payment.get_payment_method_display }} · {{ case.payment.created_at|date:'d/m/Y H:i' }}</div>
                                 <div class="text-secondary small">Cobrado {{ case.payment.price_charged }} · Recebido {{ case.payment.amount }} · {{ case.payment.received_by.username }}</div>
                                 {% else %}
@@ -302,7 +282,7 @@
                 <option value="">— nenhum —</option>
                 {% for c in unverifiable_entries %}
                 <option value="{{ c.vehicle_entry.pk }}">
-                    {{ c.vehicle_entry.brand }} {{ c.vehicle_entry.model }} ({{ c.vehicle_entry.alt_identifier|default:'sem descrição' }}) — {{ c.vehicle_entry.created_at|date:'H:i' }}
+                    {{ c.vehicle_entry.brand }} {{ c.vehicle_entry.model }} — {{ c.vehicle_entry.service|default:'-' }} — {{ c.vehicle_entry.created_at|date:'H:i' }}
                 </option>
                 {% endfor %}
             </select>
@@ -313,7 +293,7 @@
                 <option value="">— nenhum —</option>
                 {% for c in unverifiable_payments %}
                 <option value="{{ c.payment.pk }}">
-                    {{ c.payment.brand }} {{ c.payment.model }} ({{ c.payment.alt_identifier|default:'sem descrição' }}) — {{ c.payment.amount }} — {{ c.payment.created_at|date:'H:i' }}
+                    {{ c.payment.brand }} {{ c.payment.model }} — {{ c.payment.amount }} — {{ c.payment.created_at|date:'H:i' }}
                 </option>
                 {% endfor %}
             </select>

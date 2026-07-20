@@ -116,13 +116,35 @@
                         <div class="cw-form-section-icon"><i class="bi bi-info-circle"></i></div>
                         <span>Dados do registo</span>
                     </div>
-                    <div class="row g-3 mb-4">
-                        <div class="col-6"><div class="text-secondary small">Serviço</div><div class="fw-semibold">{{ entry.service|default:'-' }}</div></div>
-                        <div class="col-6"><div class="text-secondary small">Estado antes de apagar</div><div class="fw-semibold">{{ entry.get_status_display }}</div></div>
-                        <div class="col-6"><div class="text-secondary small">Registado por</div><div class="fw-semibold">{{ entry.registered_by.username }} em {{ entry.created_at|date:'d/m/Y H:i' }}</div></div>
-                        <div class="col-6"><div class="text-secondary small">Adotado por</div><div class="fw-semibold">{{ entry.claimed_by.username|default:'-' }}{% if entry.claimed_at %} em {{ entry.claimed_at|date:'d/m/Y H:i' }}{% endif %}</div></div>
-                        <div class="col-6"><div class="text-secondary small">Apagado por</div><div class="fw-semibold">{{ entry.trashed_by.username|default:'-' }}</div></div>
-                        <div class="col-6"><div class="text-secondary small">Apagado em</div><div class="fw-semibold">{{ entry.trashed_at|date:'d/m/Y H:i' }}</div></div>
+                    <div class="bg-body-tertiary rounded-4 p-3 mb-4">
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="text-secondary small">Serviço</div>
+                                <div class="fw-semibold">{{ entry.service|default:'-' }}</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-secondary small">Estado antes de apagar</div>
+                                <span class="badge bg-secondary">{{ entry.get_status_display }}</span>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-secondary small">Registado por</div>
+                                <div class="fw-semibold">{{ entry.registered_by.username }}</div>
+                                <div class="text-secondary small">{{ entry.created_at|date:'d/m/Y H:i' }}</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-secondary small">Concluído por</div>
+                                <div class="fw-semibold">{{ entry.completed_by.username|default:'-' }}</div>
+                                {% if entry.completed_at %}<div class="text-secondary small">{{ entry.completed_at|date:'d/m/Y H:i' }}</div>{% endif %}
+                            </div>
+                            <div class="col-6">
+                                <div class="text-secondary small">Apagado por</div>
+                                <div class="fw-semibold">{{ entry.trashed_by.username|default:'-' }}</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-secondary small">Apagado em</div>
+                                <div class="fw-semibold">{{ entry.trashed_at|date:'d/m/Y H:i' }}</div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="cw-form-section-header">

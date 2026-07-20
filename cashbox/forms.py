@@ -9,14 +9,13 @@ class PaymentForm(PlateValidationMixin, VehicleTypeFieldMixin, forms.ModelForm):
     class Meta:
         model = Payment
         fields = [
-            'brand', 'model', 'plate', 'no_plate', 'alt_identifier',
+            'brand', 'model', 'plate', 'no_plate',
             'service', 'price_charged', 'amount', 'payment_method', 'notes',
         ]
         widgets = {
             'brand': forms.TextInput(attrs={'class': 'form-control cw-form-input'}),
             'plate': forms.TextInput(attrs={'class': 'form-control cw-form-input cw-plate-input'}),
             'no_plate': forms.CheckboxInput(attrs={'class': 'form-check-input cw-no-plate-toggle'}),
-            'alt_identifier': forms.TextInput(attrs={'class': 'form-control cw-form-input'}),
             'service': forms.Select(attrs={'class': 'form-select cw-form-input'}),
             'price_charged': forms.NumberInput(attrs={'class': 'form-control cw-form-input', 'step': '0.01'}),
             'amount': forms.NumberInput(attrs={'class': 'form-control cw-form-input', 'step': '0.01'}),
@@ -66,6 +65,7 @@ class PeriodClosureForm(forms.Form):
     )
     carried_forward = forms.DecimalField(
         max_digits=10, decimal_places=2, required=False, initial=0,
-        label='Valor a deixar no caixa (fundo de caixa)',
+        label='Fundo de caixa a transitar',
+        help_text='Valor que fica disponível para o início do próximo período.',
         widget=forms.NumberInput(attrs={'class': 'form-control cw-form-input', 'step': '0.01'}),
     )

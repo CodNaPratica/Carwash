@@ -24,7 +24,6 @@ class Payment(models.Model):
     )
     plate = models.CharField('Matrícula', max_length=20, blank=True)
     no_plate = models.BooleanField('Sem matrícula', default=False)
-    alt_identifier = models.CharField('Chassis / Descrição', max_length=100, blank=True)
 
     service = models.ForeignKey(Service, verbose_name='Serviço', on_delete=models.PROTECT)
     price_charged = models.DecimalField('Valor cobrado', max_digits=10, decimal_places=2, default=0)

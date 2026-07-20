@@ -23,7 +23,6 @@ class VehicleType(models.Model):
 class VehicleEntry(models.Model):
     class Status(models.TextChoices):
         PENDENTE = 'pendente', 'Pendente'
-        ADOTADO = 'adotado', 'Adotado'
         CONCLUIDO = 'concluido', 'Concluído'
 
     brand = models.CharField('Marca', max_length=50)
@@ -33,7 +32,6 @@ class VehicleEntry(models.Model):
     )
     plate = models.CharField('Matrícula', max_length=20, blank=True)
     no_plate = models.BooleanField('Sem matrícula', default=False)
-    alt_identifier = models.CharField('Chassis / Descrição', max_length=100, blank=True)
     photo = models.ImageField('Foto', upload_to='vehicles/', blank=True, null=True)
     service = models.ForeignKey(
         Service, verbose_name='Serviço', on_delete=models.SET_NULL, null=True, blank=True
@@ -44,11 +42,11 @@ class VehicleEntry(models.Model):
     )
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDENTE)
 
-    claimed_by = models.ForeignKey(
+    completed_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
-        related_name='vehicle_entries_claimed'
+        related_name='vehicle_entries_completed'
     )
-    claimed_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
 
     is_trashed = models.BooleanField(default=False)
     trash_reason = models.TextField(blank=True)
@@ -68,8 +66,6 @@ class VehicleEntry(models.Model):
     def __str__(self):
         if self.plate:
             return f'{self.brand} {self.model} - {self.plate}'
-        if self.no_plate and self.alt_identifier:
-            return f'{self.brand} {self.model} - {self.alt_identifier}'
         return f'{self.brand} {self.model}'
 
 

@@ -117,13 +117,13 @@ def vehicle_trash(request, pk):
 
 
 @role_required('seguranca')
-def vehicle_adopt(request, pk):
+def vehicle_complete(request, pk):
     entry = get_object_or_404(VehicleEntry, pk=pk, is_trashed=False, status=VehicleEntry.Status.PENDENTE)
-    entry.status = VehicleEntry.Status.ADOTADO
-    entry.claimed_by = request.user
-    entry.claimed_at = timezone.now()
+    entry.status = VehicleEntry.Status.CONCLUIDO
+    entry.completed_by = request.user
+    entry.completed_at = timezone.now()
     entry.save()
-    messages.success(request, 'Registo adotado.')
+    messages.success(request, 'Registo marcado como concluído.')
     return redirect('vehicles:list')
 
 

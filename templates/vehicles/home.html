@@ -31,7 +31,7 @@
                     <div class="cw-row-card-title">{{ entry.plate|default:"Sem matrícula" }}</div>
                     <div class="cw-row-card-subtitle">{{ entry.brand }} {{ entry.model }}</div>
                 </div>
-                <span class="badge bg-secondary">{{ entry.get_status_display }}</span>
+                <span class="badge {% if entry.status == 'concluido' %}bg-success{% else %}bg-secondary{% endif %}">{{ entry.get_status_display }}</span>
             </div>
             <div class="cw-row-card-grid mb-0">
                 <div class="cw-row-card-field">

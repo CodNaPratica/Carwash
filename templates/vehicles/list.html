@@ -2,7 +2,7 @@
 {% block title %}Registos - CarWash{% endblock %}
 {% block page_icon %}<div class="cw-topbar-icon"><i class="bi bi-car-front"></i></div>{% endblock %}
 {% block page_title %}Registos{% endblock %}
-{% block page_subtitle %}Registo, adoção e acompanhamento dos veículos a lavar{% endblock %}
+{% block page_subtitle %}Registo e acompanhamento dos veículos a lavar{% endblock %}
 {% block mobile_header %}{% include 'partials/mobile_page_header.html' with icon='bi-car-front' title='Registos' subtitle='Registo e acompanhamento' %}{% endblock %}
 {% block content %}
 
@@ -30,7 +30,7 @@
                     <th>Serviço</th>
                     <th>Estado</th>
                     <th>Registado por</th>
-                    <th>Adotado por</th>
+                    <th>Concluído por</th>
                     <th>Ações</th>
                 </tr>
             </thead>
@@ -40,13 +40,13 @@
                     <td>{{ entry.plate|default:'-' }}</td>
                     <td>{{ entry.brand }} {{ entry.model }}</td>
                     <td>{{ entry.service|default:'-' }}</td>
-                    <td><span class="badge bg-secondary">{{ entry.get_status_display }}</span></td>
+                    <td><span class="badge {% if entry.status == 'concluido' %}bg-success{% else %}bg-secondary{% endif %}">{{ entry.get_status_display }}</span></td>
                     <td>{{ entry.registered_by.username }}</td>
-                    <td>{{ entry.claimed_by.username|default:'-' }}</td>
+                    <td>{{ entry.completed_by.username|default:'-' }}</td>
                     <td>
                         <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editModal{{ entry.pk }}">Editar</button>
                         {% if entry.status == 'pendente' %}
-                        <a href="{% url 'vehicles:adopt' entry.pk %}" class="btn btn-sm btn-outline-success">Adotar</a>
+                        <a href="{% url 'vehicles:complete' entry.pk %}" class="btn btn-sm btn-outline-success">Concluir</a>
                         {% endif %}
                         <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#trashModal{{ entry.pk }}">Apagar</button>
                         {% if user.is_admin_role %}
@@ -73,7 +73,7 @@
                 <div class="cw-row-card-title">{{ entry.plate|default:"Sem matrícula" }}</div>
                 <div class="cw-row-card-subtitle">{{ entry.brand }} {{ entry.model }}</div>
             </div>
-            <span class="badge bg-secondary">{{ entry.get_status_display }}</span>
+            <span class="badge {% if entry.status == 'concluido' %}bg-success{% else %}bg-secondary{% endif %}">{{ entry.get_status_display }}</span>
         </div>
         <div class="cw-row-card-grid">
             <div class="cw-row-card-field">
@@ -85,8 +85,8 @@
                 <div class="cw-row-card-value">{{ entry.registered_by.username }}</div>
             </div>
             <div class="cw-row-card-field">
-                <div class="cw-row-card-label">Adotado por</div>
-                <div class="cw-row-card-value">{{ entry.claimed_by.username|default:'-' }}</div>
+                <div class="cw-row-card-label">Concluído por</div>
+                <div class="cw-row-card-value">{{ entry.completed_by.username|default:'-' }}</div>
             </div>
         </div>
         <div class="cw-row-card-actions">
@@ -94,8 +94,8 @@
                 <i class="bi bi-pencil"></i> Editar
             </button>
             {% if entry.status == 'pendente' %}
-            <a href="{% url 'vehicles:adopt' entry.pk %}" class="btn btn-sm btn-outline-success">
-                <i class="bi bi-check2"></i> Adotar
+            <a href="{% url 'vehicles:complete' entry.pk %}" class="btn btn-sm btn-outline-success">
+                <i class="bi bi-check2"></i> Concluir
             </a>
             {% endif %}
             <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#trashModal{{ entry.pk }}">
