@@ -1,20 +1,19 @@
 from django.contrib.auth.models import AbstractUser
-from django.db import models
 
 
 class User(AbstractUser):
-    class Role(models.TextChoices):
-        SEGURANCA = 'seguranca', 'Segurança'
-        TESOUREIRA = 'tesoureira', 'Tesoureira'
-        ADMIN = 'admin', 'Admin'
-
-    role = models.CharField(max_length=20, choices=Role.choices)
-
     def is_seguranca(self):
-        return self.role == self.Role.SEGURANCA
+        return self.groups.filter(name='Operador de Registo').exists()
 
     def is_tesoureira(self):
-        return self.role == self.Role.TESOUREIRA
+        return self.groups.filter(name='Caixa').exists()
 
     def is_admin_role(self):
-        return self.role == self.Role.ADMIN or self.is_superuser
+        return self.is_superuser or self.groups.filter(name='Admin').exists()
+
+    @property
+    def role_label(self):
+        if self.is_admin_role():
+            return 'Admin'
+        group = self.groups.order_by('name').first()
+        return group.name if group else 'Sem perfil'

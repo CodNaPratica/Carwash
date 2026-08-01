@@ -2,8 +2,8 @@
 {% block title %}Conferência - CarWash{% endblock %}
 {% block page_icon %}<div class="cw-topbar-icon"><i class="bi bi-shield-check"></i></div>{% endblock %}
 {% block page_title %}Conferência de Registos{% endblock %}
-{% block page_subtitle %}Cruzamento entre segurança e tesoureira{% endblock %}
-{% block mobile_header %}{% include 'partials/mobile_page_header.html' with icon='bi-shield-check' title='Conferência' subtitle='Cruzamento segurança x tesoureira' %}{% endblock %}
+{% block page_subtitle %}Cruzamento entre operador de registo e caixa{% endblock %}
+{% block mobile_header %}{% include 'partials/mobile_page_header.html' with icon='bi-shield-check' title='Conferência' subtitle='Cruzamento operador de registo x caixa' %}{% endblock %}
 {% block content %}
 
 <form method="get" class="d-flex align-items-end gap-2 mb-4">
@@ -18,13 +18,13 @@
     <div class="col-6 col-md-4 col-lg-2">
         <div class="bg-white border rounded-4 p-3 h-100">
             <div class="fs-4 fw-bold lh-1">{{ summary.entries_count }}</div>
-            <div class="text-secondary small">Registos (segurança)</div>
+            <div class="text-secondary small">Registos (operador de registo)</div>
         </div>
     </div>
     <div class="col-6 col-md-4 col-lg-2">
         <div class="bg-white border rounded-4 p-3 h-100">
             <div class="fs-4 fw-bold lh-1">{{ summary.payments_count }}</div>
-            <div class="text-secondary small">Pagamentos (tesoureira)</div>
+            <div class="text-secondary small">Pagamentos (caixa)</div>
         </div>
     </div>
     <div class="col-6 col-md-4 col-lg-2">
@@ -63,8 +63,8 @@
         <table class="table table-hover align-middle small mb-0">
             <thead class="table-light">
                 <tr>
-                    <th>Segurança</th>
-                    <th>Tesoureira</th>
+                    <th>Operador de Registo</th>
+                    <th>Caixa</th>
                     <th>Valores</th>
                     <th>Estado</th>
                     <th class="text-end">Detalhes</th>
@@ -140,13 +140,13 @@
         </div>
         <div class="cw-row-card-grid">
             <div class="cw-row-card-field" style="grid-column: span 2;">
-                <div class="cw-row-card-label">Segurança</div>
+                <div class="cw-row-card-label">Operador de Registo</div>
                 <div class="cw-row-card-value">
                     {% if case.vehicle_entry %}{{ case.vehicle_entry.brand }} {{ case.vehicle_entry.model }} — {{ case.vehicle_entry.plate|default:'Sem matrícula' }} · {{ case.vehicle_entry.service|default:'-' }}{% else %}— sem registo —{% endif %}
                 </div>
             </div>
             <div class="cw-row-card-field" style="grid-column: span 2;">
-                <div class="cw-row-card-label">Tesoureira</div>
+                <div class="cw-row-card-label">Caixa</div>
                 <div class="cw-row-card-value">
                     {% if case.payment %}{{ case.payment.brand }} {{ case.payment.model }} — {{ case.payment.plate|default:'Sem matrícula' }} · Cobrado {{ case.payment.price_charged }} · Recebido {{ case.payment.amount }}{% else %}— sem registo —{% endif %}
                 </div>
@@ -198,7 +198,7 @@
                             <div class="bg-body-tertiary rounded-3 p-3 h-100">
                                 <div class="d-flex align-items-center gap-2 mb-2">
                                     <div class="cw-icon-box-sm bg-navy rounded-3 d-flex align-items-center justify-content-center text-white"><i class="bi bi-shield-check"></i></div>
-                                    <span class="text-secondary small fw-semibold text-uppercase">Segurança</span>
+                                    <span class="text-secondary small fw-semibold text-uppercase">Operador de Registo</span>
                                 </div>
                                 {% if case.vehicle_entry %}
                                 <div class="fw-semibold">{{ case.vehicle_entry.brand }} {{ case.vehicle_entry.model }} — {{ case.vehicle_entry.plate|default:'Sem matrícula' }}</div>
@@ -213,7 +213,7 @@
                             <div class="bg-body-tertiary rounded-3 p-3 h-100">
                                 <div class="d-flex align-items-center gap-2 mb-2">
                                     <div class="cw-icon-box-sm bg-good rounded-3 d-flex align-items-center justify-content-center text-white"><i class="bi bi-cash-coin"></i></div>
-                                    <span class="text-secondary small fw-semibold text-uppercase">Tesoureira</span>
+                                    <span class="text-secondary small fw-semibold text-uppercase">Caixa</span>
                                 </div>
                                 {% if case.payment %}
                                 <div class="fw-semibold">{{ case.payment.brand }} {{ case.payment.model }} — {{ case.payment.plate|default:'Sem matrícula' }}</div>
@@ -235,7 +235,7 @@
                     {% endif %}
 
                     {% if case.status == 'ok' and not case.is_reviewed %}
-                    <p class="text-secondary small">Este caso já bate certo entre segurança e tesoureira. Confirmar deixa uma marca de que um humano reviu e valida este cruzamento.</p>
+                    <p class="text-secondary small">Este caso já bate certo entre o operador de registo e a caixa. Confirmar deixa uma marca de que um humano reviu e valida este cruzamento.</p>
                     {% endif %}
 
                     <hr class="my-3">
@@ -277,7 +277,7 @@
     <input type="hidden" name="data" value="{{ target_date|date:'Y-m-d' }}">
     <div class="row g-3">
         <div class="col-md-6">
-            <label class="form-label small fw-semibold">Registo do segurança</label>
+            <label class="form-label small fw-semibold">Registo do operador</label>
             <select name="vehicle_entry_id" class="form-select cw-form-input">
                 <option value="">— nenhum —</option>
                 {% for c in unverifiable_entries %}
@@ -288,7 +288,7 @@
             </select>
         </div>
         <div class="col-md-6">
-            <label class="form-label small fw-semibold">Pagamento da tesoureira</label>
+            <label class="form-label small fw-semibold">Pagamento da caixa</label>
             <select name="payment_id" class="form-select cw-form-input">
                 <option value="">— nenhum —</option>
                 {% for c in unverifiable_payments %}

@@ -13,7 +13,7 @@ from .models import Reconciliation
 from .services import run_reconciliation
 
 
-@role_required('admin')
+@role_required('Admin')
 def reconciliation_view(request):
     date_param = request.GET.get('data')
     if date_param:
@@ -63,7 +63,7 @@ def reconciliation_view(request):
     })
 
 
-@role_required('admin')
+@role_required('Admin')
 def update_investigation(request, pk):
     case = get_object_or_404(Reconciliation, pk=pk)
     if request.method != 'POST':
@@ -89,7 +89,7 @@ def update_investigation(request, pk):
     return redirect(url)
 
 
-@role_required('admin')
+@role_required('Admin')
 def manual_link(request):
     if request.method != 'POST':
         return redirect('audit:reconciliation')

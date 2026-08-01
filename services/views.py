@@ -40,12 +40,12 @@ def _list_context(**overrides):
     return context
 
 
-@role_required('admin')
+@role_required('Admin')
 def service_list(request):
     return render(request, 'services/list.html', _list_context())
 
 
-@role_required('admin')
+@role_required('Admin')
 def service_create(request):
     if request.method == 'POST':
         form = ServiceForm(request.POST)
@@ -57,7 +57,7 @@ def service_create(request):
     return redirect('services:list')
 
 
-@role_required('admin')
+@role_required('Admin')
 def service_edit(request, pk):
     service = get_object_or_404(Service, pk=pk)
     if request.method != 'POST':
@@ -77,7 +77,7 @@ def service_edit(request, pk):
     return render(request, 'services/list.html', context)
 
 
-@role_required('admin')
+@role_required('Admin')
 def service_prices_update(request, pk):
     service = get_object_or_404(Service, pk=pk)
     if request.method != 'POST':
@@ -98,7 +98,7 @@ def service_prices_update(request, pk):
     return redirect('services:list')
 
 
-@role_required('tesoureira')
+@role_required('Caixa')
 @require_POST
 def service_quick_create(request):
     try:
@@ -113,7 +113,7 @@ def service_quick_create(request):
     return JsonResponse({'errors': form.errors}, status=400)
 
 
-@role_required('tesoureira')
+@role_required('Caixa')
 def service_price_lookup(request):
     service_id = request.GET.get('service')
     vehicle_type_id = request.GET.get('vehicle_type')

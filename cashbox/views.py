@@ -45,7 +45,7 @@ def _dashboard_context(user, **overrides):
     return context
 
 
-@role_required('tesoureira')
+@role_required('Caixa')
 def home(request):
     today = timezone.localdate()
     total_in, total_out = totals_for_range(today, today)
@@ -61,7 +61,7 @@ def home(request):
     })
 
 
-@role_required('tesoureira')
+@role_required('Caixa')
 def dashboard(request):
     open_param = request.GET.get('open')
     overrides = {}
@@ -72,7 +72,7 @@ def dashboard(request):
     return render(request, 'cashbox/dashboard.html', _dashboard_context(request.user, **overrides))
 
 
-@role_required('tesoureira')
+@role_required('Caixa')
 def payment_create(request):
     unclosed_day = get_unclosed_previous_day()
     if unclosed_day:
@@ -90,7 +90,7 @@ def payment_create(request):
     return redirect('cashbox:dashboard')
 
 
-@role_required('tesoureira')
+@role_required('Caixa')
 def movement_create(request):
     unclosed_day = get_unclosed_previous_day()
     if unclosed_day:
@@ -108,7 +108,7 @@ def movement_create(request):
     return redirect('cashbox:dashboard')
 
 
-@role_required('tesoureira')
+@role_required('Caixa')
 def daily_closure(request, date):
     date = datetime.strptime(date, '%Y-%m-%d').date()
     if request.method != 'POST':
@@ -128,7 +128,7 @@ def daily_closure(request, date):
     return redirect('cashbox:dashboard')
 
 
-@role_required('admin')
+@role_required('Admin')
 def closures(request):
     closure_list = CashClosure.objects.all()
     return render(request, 'cashbox/closures.html', {
@@ -138,7 +138,7 @@ def closures(request):
     })
 
 
-@role_required('admin')
+@role_required('Admin')
 def period_closure_create(request):
     if request.method == 'POST':
         form = PeriodClosureForm(request.POST)

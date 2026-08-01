@@ -39,7 +39,7 @@ def dashboard(request):
     return redirect('login')
 
 
-@role_required('admin')
+@role_required('Admin')
 def admin_dashboard(request):
     today = timezone.localdate()
     pending_count = VehicleEntry.objects.filter(is_trashed=False, status=VehicleEntry.Status.PENDENTE).count()
@@ -81,12 +81,12 @@ def _user_list_context(**overrides):
     return context
 
 
-@role_required('admin')
+@role_required('Admin')
 def user_list(request):
     return render(request, 'accounts/user_list.html', _user_list_context())
 
 
-@role_required('admin')
+@role_required('Admin')
 def user_create(request):
     if request.method == 'POST':
         form = UserCreateForm(request.POST)
@@ -98,7 +98,7 @@ def user_create(request):
     return redirect('user_list')
 
 
-@role_required('admin')
+@role_required('Admin')
 def user_edit(request, pk):
     user_obj = get_object_or_404(User, pk=pk)
     if request.method != 'POST':
@@ -118,7 +118,7 @@ def user_edit(request, pk):
     return render(request, 'accounts/user_list.html', context)
 
 
-@role_required('admin')
+@role_required('Admin')
 def user_set_password(request, pk):
     user_obj = get_object_or_404(User, pk=pk)
     if request.method != 'POST':

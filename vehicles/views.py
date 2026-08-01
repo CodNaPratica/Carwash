@@ -34,7 +34,7 @@ def _list_context(user, **overrides):
     return context
 
 
-@role_required('seguranca')
+@role_required('Operador de Registo')
 def vehicle_home(request):
     today_entries = VehicleEntry.objects.filter(is_trashed=False, created_at__date=timezone.localdate())
     return render(request, 'vehicles/home.html', {
@@ -43,7 +43,7 @@ def vehicle_home(request):
     })
 
 
-@role_required('seguranca')
+@role_required('Operador de Registo')
 def vehicle_list(request):
     open_param = request.GET.get('open')
     return render(request, 'vehicles/list.html', _list_context(
@@ -51,7 +51,7 @@ def vehicle_list(request):
     ))
 
 
-@role_required('seguranca')
+@role_required('Operador de Registo')
 def vehicle_create(request):
     if request.method == 'POST':
         form = VehicleEntryForm(request.POST, request.FILES, user=request.user)
@@ -65,7 +65,7 @@ def vehicle_create(request):
     return redirect('vehicles:list')
 
 
-@role_required('seguranca')
+@role_required('Operador de Registo')
 def vehicle_edit(request, pk):
     entry = get_object_or_404(VehicleEntry, pk=pk, is_trashed=False)
     if request.method != 'POST':
@@ -92,7 +92,7 @@ def vehicle_edit(request, pk):
     return render(request, 'vehicles/list.html', context)
 
 
-@role_required('seguranca')
+@role_required('Operador de Registo')
 def vehicle_trash(request, pk):
     entry = get_object_or_404(VehicleEntry, pk=pk, is_trashed=False)
     if request.method != 'POST':
@@ -116,7 +116,7 @@ def vehicle_trash(request, pk):
     return render(request, 'vehicles/list.html', context)
 
 
-@role_required('seguranca')
+@role_required('Operador de Registo')
 def vehicle_complete(request, pk):
     entry = get_object_or_404(VehicleEntry, pk=pk, is_trashed=False, status=VehicleEntry.Status.PENDENTE)
     entry.status = VehicleEntry.Status.CONCLUIDO
@@ -127,13 +127,13 @@ def vehicle_complete(request, pk):
     return redirect('vehicles:list')
 
 
-@role_required('admin')
+@role_required('Admin')
 def vehicle_trash_list(request):
     entries = VehicleEntry.objects.filter(is_trashed=True).prefetch_related('logs')
     return render(request, 'vehicles/trash_list.html', {'entries': entries})
 
 
-@role_required('admin')
+@role_required('Admin')
 def vehicle_restore(request, pk):
     entry = get_object_or_404(VehicleEntry, pk=pk, is_trashed=True)
     if request.method != 'POST':
@@ -152,7 +152,7 @@ def vehicle_restore(request, pk):
     return redirect('vehicles:trash_list')
 
 
-@role_required('admin')
+@role_required('Admin')
 def vehicle_permanent_delete(request, pk):
     entry = get_object_or_404(VehicleEntry, pk=pk, is_trashed=True)
     if request.method != 'POST':
@@ -162,7 +162,7 @@ def vehicle_permanent_delete(request, pk):
     return redirect('vehicles:trash_list')
 
 
-@role_required('admin')
+@role_required('Admin')
 def vehicle_type_create(request):
     if request.method == 'POST':
         form = VehicleTypeForm(request.POST)
@@ -178,7 +178,7 @@ def vehicle_type_create(request):
     return redirect('vehicles:list')
 
 
-@role_required('admin')
+@role_required('Admin')
 def vehicle_type_approve(request, pk):
     vehicle_type = get_object_or_404(VehicleType, pk=pk)
     if request.method != 'POST':
@@ -189,7 +189,7 @@ def vehicle_type_approve(request, pk):
     return redirect(f"{reverse('vehicles:list')}?open=types")
 
 
-@role_required('admin')
+@role_required('Admin')
 def vehicle_type_delete(request, pk):
     vehicle_type = get_object_or_404(VehicleType, pk=pk)
     if request.method != 'POST':

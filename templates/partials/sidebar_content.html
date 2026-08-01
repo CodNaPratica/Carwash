@@ -1,7 +1,7 @@
 {% load static %}
 <div class="d-flex align-items-center gap-2 mb-4">
     <div class="bg-white rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px;"><i class="bi bi-droplet-half text-navy fs-4"></i></div>
-    <div>
+    <div class="cw-sidebar-label">
         <div class="fw-bold fs-5 lh-1">CarWash</div>
         <div class="small text-white-50">Gestão inteligente</div>
     </div>
@@ -9,58 +9,55 @@
 
 <div class="bg-white bg-opacity-10 rounded-3 p-2 d-flex align-items-center gap-2 mb-4">
     <div class="rounded-circle bg-orange text-white d-flex align-items-center justify-content-center fw-bold flex-shrink-0" style="width: 38px; height: 38px;">{{ user.username|slice:':1'|upper }}</div>
-    <div class="min-w-0">
+    <div class="min-w-0 cw-sidebar-label">
         <div class="fw-semibold small lh-1">{{ user.get_full_name|default:user.username }}</div>
-        <div class="text-white-50 small">{{ user.get_role_display }}</div>
+        <div class="text-white-50 small">{{ user.role_label }}</div>
     </div>
 </div>
 
 <nav class="cw-sidebar-nav nav flex-column">
     {% if user.is_admin_role %}
     <a class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}"
-       href="{% url 'admin_dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+       href="{% url 'admin_dashboard' %}"><i class="bi bi-speedometer2"></i> <span class="cw-sidebar-label">Dashboard</span></a>
     {% endif %}
 
     {% if user.is_seguranca %}
     <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
-       href="{% url 'vehicles:home' %}"><i class="bi bi-house-door"></i> Início</a>
+       href="{% url 'vehicles:home' %}"><i class="bi bi-house-door"></i> <span class="cw-sidebar-label">Início</span></a>
     {% endif %}
     {% if user.is_seguranca or user.is_admin_role %}
     <a class="nav-link {% if request.resolver_match.app_name == 'vehicles' and request.resolver_match.url_name != 'trash_list' and request.resolver_match.url_name != 'home' %}active{% endif %}"
-       href="{% url 'vehicles:list' %}"><i class="bi bi-car-front"></i> Registos</a>
+       href="{% url 'vehicles:list' %}"><i class="bi bi-car-front"></i> <span class="cw-sidebar-label">Registos</span></a>
     {% endif %}
 
     {% if user.is_tesoureira %}
     <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
-       href="{% url 'cashbox:home' %}"><i class="bi bi-house-door"></i> Início</a>
+       href="{% url 'cashbox:home' %}"><i class="bi bi-house-door"></i> <span class="cw-sidebar-label">Início</span></a>
     {% endif %}
     {% if user.is_tesoureira or user.is_admin_role %}
     <a class="nav-link {% if request.resolver_match.app_name == 'cashbox' and request.resolver_match.url_name != 'closures' and request.resolver_match.url_name != 'period_closure_create' and request.resolver_match.url_name != 'home' %}active{% endif %}"
-       href="{% url 'cashbox:dashboard' %}"><i class="bi bi-cash-coin"></i> Caixa</a>
+       href="{% url 'cashbox:dashboard' %}"><i class="bi bi-cash-coin"></i> <span class="cw-sidebar-label">Caixa</span></a>
     {% endif %}
 
     {% if user.is_admin_role %}
     <a class="nav-link {% if request.resolver_match.app_name == 'audit' %}active{% endif %}"
-       href="{% url 'audit:reconciliation' %}"><i class="bi bi-shield-check"></i> Conferência</a>
+       href="{% url 'audit:reconciliation' %}"><i class="bi bi-shield-check"></i> <span class="cw-sidebar-label">Conferência</span></a>
     <a class="nav-link {% if request.resolver_match.url_name == 'trash_list' %}active{% endif %}"
-       href="{% url 'vehicles:trash_list' %}"><i class="bi bi-trash"></i> Lixo</a>
+       href="{% url 'vehicles:trash_list' %}"><i class="bi bi-trash"></i> <span class="cw-sidebar-label">Lixo</span></a>
     <a class="nav-link {% if request.resolver_match.url_name == 'closures' or request.resolver_match.url_name == 'period_closure_create' %}active{% endif %}"
-       href="{% url 'cashbox:closures' %}"><i class="bi bi-bar-chart-line"></i> Fechamentos</a>
+       href="{% url 'cashbox:closures' %}"><i class="bi bi-bar-chart-line"></i> <span class="cw-sidebar-label">Fechamentos</span></a>
     <a class="nav-link {% if request.resolver_match.app_name == 'services' %}active{% endif %}"
-       href="{% url 'services:list' %}"><i class="bi bi-droplet"></i> Serviços</a>
+       href="{% url 'services:list' %}"><i class="bi bi-droplet"></i> <span class="cw-sidebar-label">Serviços</span></a>
     <a class="nav-link {% if request.resolver_match.url_name == 'user_list' %}active{% endif %}"
-       href="{% url 'user_list' %}"><i class="bi bi-people"></i> Usuários</a>
+       href="{% url 'user_list' %}"><i class="bi bi-people"></i> <span class="cw-sidebar-label">Usuários</span></a>
     {% endif %}
 
     <a class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}"
-       href="{% url 'profile' %}"><i class="bi bi-person-circle"></i> Perfil</a>
+       href="{% url 'profile' %}"><i class="bi bi-person-circle"></i> <span class="cw-sidebar-label">Perfil</span></a>
 </nav>
 
-<div class="mt-auto pt-3">
-    <form method="post" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <button class="nav-link border-0 bg-transparent w-100 text-start" type="submit">
-            <i class="bi bi-box-arrow-left"></i> Sair
-        </button>
-    </form>
+<div class="mt-auto pt-3 d-none d-lg-block">
+    <button type="button" class="cw-sidebar-toggle nav-link border-0 bg-transparent w-100 text-start">
+        <i class="bi bi-chevron-double-left cw-sidebar-toggle-icon"></i> <span class="cw-sidebar-label">Fechar menu</span>
+    </button>
 </div>

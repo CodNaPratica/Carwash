@@ -28,7 +28,7 @@
                 <tr>
                     <td>{{ u.username }}</td>
                     <td>{{ u.get_full_name|default:'-' }}</td>
-                    <td><span class="badge bg-secondary">{{ u.get_role_display }}</span></td>
+                    <td><span class="badge bg-secondary">{{ u.role_label }}</span></td>
                     <td>
                         {% if u.is_active %}<span class="badge bg-success">Ativo</span>{% else %}<span class="badge bg-danger">Inativo</span>{% endif %}
                     </td>
@@ -59,7 +59,7 @@
             {% if u.is_active %}<span class="badge bg-success">Ativo</span>{% else %}<span class="badge bg-danger">Inativo</span>{% endif %}
         </div>
         <div class="cw-row-card-grid">
-            <div class="cw-row-card-field"><div class="cw-row-card-label">Perfil</div><div class="cw-row-card-value">{{ u.get_role_display }}</div></div>
+            <div class="cw-row-card-field"><div class="cw-row-card-label">Perfil</div><div class="cw-row-card-value">{{ u.role_label }}</div></div>
         </div>
         <div class="cw-row-card-actions">
             <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editUserModal{{ u.pk }}">
@@ -93,7 +93,7 @@
                     </div>
                     <div class="cw-form-tip">
                         <div class="cw-form-tip-title"><i class="bi bi-stars"></i> DICA</div>
-                        <p>O perfil (segurança, tesoureira ou admin) define o que a pessoa vê e pode fazer no sistema.</p>
+                        <p>O perfil (Operador de Registo, Caixa ou Admin) define o que a pessoa vê e pode fazer no sistema.</p>
                     </div>
                 </div>
                 <div class="col-lg-8 cw-form-main">

@@ -11,7 +11,7 @@
 </head>
 <body{% if user.is_authenticated %} class="cw-has-bottom-nav"{% endif %}>
 {% if user.is_authenticated %}
-<div class="cw-app">
+<div class="cw-app" id="cwApp">
     <aside class="cw-sidebar d-none d-lg-flex">
         {% include 'partials/sidebar_content.html' %}
     </aside>
@@ -59,8 +59,8 @@
                 <div class="min-w-0">
                     <div class="text-white fw-bold lh-1">CarWash</div>
                     <div class="text-orange fw-bold text-uppercase" style="font-size: .68rem;">
-                        {% if user.is_seguranca %}Portal do Segurança
-                        {% elif user.is_tesoureira %}Portal da Tesoureira
+                        {% if user.is_seguranca %}Portal do Operador de Registo
+                        {% elif user.is_tesoureira %}Portal da Caixa
                         {% elif user.is_admin_role %}Portal do Admin
                         {% endif %}
                     </div>
@@ -184,6 +184,21 @@
     document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.cw-no-plate-toggle').forEach(cwSyncNoPlate);
     });
+
+    // Sidebar collapse/expand toggle (desktop only), remembered across visits.
+    (function () {
+        var app = document.getElementById('cwApp');
+        if (!app) return;
+        if (localStorage.getItem('cwSidebarCollapsed') === '1') {
+            app.classList.add('cw-sidebar-collapsed');
+        }
+        document.querySelectorAll('.cw-sidebar-toggle').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var collapsed = app.classList.toggle('cw-sidebar-collapsed');
+                localStorage.setItem('cwSidebarCollapsed', collapsed ? '1' : '0');
+            });
+        });
+    })();
 </script>
 </body>
 </html>

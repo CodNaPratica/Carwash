@@ -12,7 +12,7 @@
         <div class="min-w-0">
             <div class="fw-bold text-truncate">{{ user.get_full_name|default:user.username }}</div>
             <div class="text-white-50 small mb-1">@{{ user.username }}</div>
-            <span class="badge rounded-pill bg-white bg-opacity-25"><i class="bi bi-shield-fill me-1"></i>{{ user.get_role_display }}</span>
+            <span class="badge rounded-pill bg-white bg-opacity-25"><i class="bi bi-shield-fill me-1"></i>{{ user.role_label }}</span>
         </div>
     </div>
 
@@ -63,7 +63,7 @@
                 </div>
                 <div class="col-6">
                     <div class="text-secondary small">Perfil</div>
-                    <div class="fw-semibold">{{ user.get_role_display }}</div>
+                    <div class="fw-semibold">{{ user.role_label }}</div>
                 </div>
             </div>
             {% include 'accounts/_profile_data_form.html' %}

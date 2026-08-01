@@ -132,7 +132,7 @@
                     </div>
                     <div class="cw-form-tip">
                         <div class="cw-form-tip-title"><i class="bi bi-stars"></i> DICA</div>
-                        <p>O veículo fica com estado "Pendente" até um segurança o adotar. A foto e o serviço são opcionais nesta etapa.</p>
+                        <p>O veículo fica com estado "Pendente" até o operador de registo marcar como concluído. A foto e o serviço são opcionais nesta etapa.</p>
                     </div>
                 </div>
                 <div class="col-lg-8 cw-form-main">
@@ -283,7 +283,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
             <div class="modal-body">
-                <p class="text-secondary small">Lista usada no dropdown "Tipo de Veículo" do registo e do pagamento. Tipos criados aqui já ficam aprovados; os que a segurança/tesoureira adicionam via "Outro" aparecem pendentes até serem aprovados.</p>
+                <p class="text-secondary small">Lista usada no dropdown "Tipo de Veículo" do registo e do pagamento. Tipos criados aqui já ficam aprovados; os que o operador de registo/a caixa adicionam via "Outro" aparecem pendentes até serem aprovados.</p>
 
                 <form method="post" action="{% url 'vehicles:type_create' %}" class="d-flex gap-2 align-items-start mb-3">
                     {% csrf_token %}
