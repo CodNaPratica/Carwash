@@ -85,6 +85,9 @@ class CashClosure(models.Model):
                 fields=['period_type', 'date_start', 'date_end'], name='unique_closure_period'
             )
         ]
+        permissions = [
+            ('close_period', 'Pode fechar período semanal/mensal'),
+        ]
 
     def __str__(self):
         return f'Fecho {self.get_period_type_display()} {self.date_start} a {self.date_end}'

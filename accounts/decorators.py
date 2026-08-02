@@ -5,16 +5,19 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 
 
-def role_required(*roles):
-    """Restringe uma view a utilizadores pertencentes a um dos grupos indicados.
-    Admins (grupo 'admin' ou superuser) têm sempre acesso.
+def permission_required(*perms):
+    """Restringe uma view a utilizadores com alguma das Permission indicadas
+    (codename com prefixo de app, ex. 'vehicles.add_vehicleentry'). Superusers
+    e membros de grupos com essa permissão atribuída têm sempre acesso - a
+    ligação entre "quem pode o quê" fica toda em Group/Permission (giríveis em
+    /admin/auth/group/), não hardcoded aqui.
     """
     def decorator(view_func):
         @wraps(view_func)
         @login_required
         def _wrapped(request, *args, **kwargs):
             user = request.user
-            if user.is_admin_role() or user.groups.filter(name__in=roles).exists():
+            if any(user.has_perm(perm) for perm in perms):
                 return view_func(request, *args, **kwargs)
             messages.error(request, 'Não tem permissão para aceder a esta página.')
             return redirect('dashboard')

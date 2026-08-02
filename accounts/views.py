@@ -9,7 +9,7 @@ from cashbox.models import CashClosure
 from cashbox.services import totals_for_range
 from vehicles.models import VehicleEntry
 
-from .decorators import role_required
+from .decorators import permission_required
 from .forms import BootstrapAuthenticationForm, CwPasswordChangeForm, ProfileForm, SetPasswordForm, UserCreateForm, UserEditForm
 from .models import User
 
@@ -39,7 +39,7 @@ def dashboard(request):
     return redirect('login')
 
 
-@role_required('Admin')
+@permission_required('accounts.view_admin_dashboard')
 def admin_dashboard(request):
     today = timezone.localdate()
     pending_count = VehicleEntry.objects.filter(is_trashed=False, status=VehicleEntry.Status.PENDENTE).count()
@@ -81,12 +81,12 @@ def _user_list_context(**overrides):
     return context
 
 
-@role_required('Admin')
+@permission_required('accounts.view_user')
 def user_list(request):
     return render(request, 'accounts/user_list.html', _user_list_context())
 
 
-@role_required('Admin')
+@permission_required('accounts.add_user')
 def user_create(request):
     if request.method == 'POST':
         form = UserCreateForm(request.POST)
@@ -98,7 +98,7 @@ def user_create(request):
     return redirect('user_list')
 
 
-@role_required('Admin')
+@permission_required('accounts.change_user')
 def user_edit(request, pk):
     user_obj = get_object_or_404(User, pk=pk)
     if request.method != 'POST':
@@ -118,7 +118,7 @@ def user_edit(request, pk):
     return render(request, 'accounts/user_list.html', context)
 
 
-@role_required('Admin')
+@permission_required('accounts.change_user')
 def user_set_password(request, pk):
     user_obj = get_object_or_404(User, pk=pk)
     if request.method != 'POST':

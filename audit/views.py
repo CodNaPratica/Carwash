@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 
-from accounts.decorators import role_required
+from accounts.decorators import permission_required
 from cashbox.models import Payment
 from vehicles.models import VehicleEntry
 
@@ -13,7 +13,7 @@ from .models import Reconciliation
 from .services import run_reconciliation
 
 
-@role_required('Admin')
+@permission_required('audit.view_reconciliation')
 def reconciliation_view(request):
     date_param = request.GET.get('data')
     if date_param:
@@ -63,7 +63,7 @@ def reconciliation_view(request):
     })
 
 
-@role_required('Admin')
+@permission_required('audit.change_reconciliation')
 def update_investigation(request, pk):
     case = get_object_or_404(Reconciliation, pk=pk)
     if request.method != 'POST':
@@ -89,7 +89,7 @@ def update_investigation(request, pk):
     return redirect(url)
 
 
-@role_required('Admin')
+@permission_required('audit.add_reconciliation')
 def manual_link(request):
     if request.method != 'POST':
         return redirect('audit:reconciliation')

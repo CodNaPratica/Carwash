@@ -2,18 +2,19 @@
 <div class="d-flex align-items-center gap-2 mb-4">
     <div class="bg-white rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 44px; height: 44px;"><i class="bi bi-droplet-half text-navy fs-4"></i></div>
     <div class="cw-sidebar-label">
-        <div class="fw-bold fs-5 lh-1">CarWash</div>
-        <div class="small text-white-50">Gestão inteligente</div>
+        <div class="fw-bold fs-5 lh-1 text-uppercase">CarWash</div>
+        <div class="small text-orange fst-italic">Gestão inteligente</div>
     </div>
 </div>
 
-<div class="bg-white bg-opacity-10 rounded-3 p-2 d-flex align-items-center gap-2 mb-4">
+<div class="bg-white bg-opacity-10 rounded-3 p-2 d-flex align-items-center gap-2 mb-2">
     <div class="rounded-circle bg-orange text-white d-flex align-items-center justify-content-center fw-bold flex-shrink-0" style="width: 38px; height: 38px;">{{ user.username|slice:':1'|upper }}</div>
     <div class="min-w-0 cw-sidebar-label">
         <div class="fw-semibold small lh-1">{{ user.get_full_name|default:user.username }}</div>
         <div class="text-white-50 small">{{ user.role_label }}</div>
     </div>
 </div>
+<hr class="border-white border-opacity-10 my-2">
 
 <nav class="cw-sidebar-nav nav flex-column">
     {% if user.is_admin_role %}
@@ -55,9 +56,3 @@
     <a class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}"
        href="{% url 'profile' %}"><i class="bi bi-person-circle"></i> <span class="cw-sidebar-label">Perfil</span></a>
 </nav>
-
-<div class="mt-auto pt-3 d-none d-lg-block">
-    <button type="button" class="cw-sidebar-toggle nav-link border-0 bg-transparent w-100 text-start">
-        <i class="bi bi-chevron-double-left cw-sidebar-toggle-icon"></i> <span class="cw-sidebar-label">Fechar menu</span>
-    </button>
-</div>

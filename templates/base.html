@@ -5,15 +5,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}CarWash{% endblock %}</title>
+    <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="{% static 'css/theme.css' %}" rel="stylesheet">
+    <link href="{% static 'css/theme.css' %}?v={% now 'U' %}" rel="stylesheet">
 </head>
 <body{% if user.is_authenticated %} class="cw-has-bottom-nav"{% endif %}>
 {% if user.is_authenticated %}
 <div class="cw-app" id="cwApp">
     <aside class="cw-sidebar d-none d-lg-flex">
-        {% include 'partials/sidebar_content.html' %}
+        <div class="cw-sidebar-scroll">
+            {% include 'partials/sidebar_content.html' %}
+        </div>
+        <div class="cw-sidebar-footer">
+            <a href="{% url 'profile' %}" class="cw-sidebar-settings-btn" title="Definições">
+                <i class="bi bi-gear"></i>
+            </a>
+            <button type="button" class="cw-sidebar-toggle cw-sidebar-collapse-btn">
+                <span class="cw-sidebar-label cw-sidebar-collapse-label">Recolher</span>
+                <i class="bi bi-chevron-left cw-sidebar-toggle-icon"></i>
+            </button>
+        </div>
     </aside>
 
     <div class="offcanvas offcanvas-start cw-sidebar-mobile d-lg-none" tabindex="-1" id="cwSidebarOffcanvas">
@@ -40,9 +52,6 @@
                 <button type="button" class="btn bg-navy text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0" style="width: 38px; height: 38px;" title="Notificações">
                     <i class="bi bi-bell"></i>
                 </button>
-                <a href="{% url 'profile' %}" class="btn bg-navy text-white rounded-circle d-flex align-items-center justify-content-center p-0 border-0" style="width: 38px; height: 38px;" title="Perfil e definições">
-                    <i class="bi bi-gear"></i>
-                </a>
                 <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
                     <button class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center p-0" style="width: 38px; height: 38px;" type="submit" title="Sair">
@@ -199,6 +208,27 @@
             });
         });
     })();
+
+    // Permissions checklist: "Acesso total" per section checks/unchecks the
+    // whole group, and reflects back to "checked" if every item in the
+    // group ends up ticked by hand.
+    function cwSyncPermGroupAll(group) {
+        var all = group.querySelectorAll('.cw-perm-checkbox');
+        var groupAll = group.querySelector('.cw-perm-group-all');
+        if (!groupAll || !all.length) return;
+        groupAll.checked = Array.prototype.every.call(all, function (cb) { return cb.checked; });
+    }
+    document.addEventListener('change', function (e) {
+        if (e.target.matches('.cw-perm-group-all')) {
+            var group = e.target.closest('.cw-perm-group');
+            group.querySelectorAll('.cw-perm-checkbox').forEach(function (cb) { cb.checked = e.target.checked; });
+        } else if (e.target.matches('.cw-perm-checkbox')) {
+            cwSyncPermGroupAll(e.target.closest('.cw-perm-group'));
+        }
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.cw-perm-group').forEach(cwSyncPermGroupAll);
+    });
 </script>
 </body>
 </html>

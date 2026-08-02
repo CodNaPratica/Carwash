@@ -62,6 +62,9 @@ class VehicleEntry(models.Model):
     class Meta:
         ordering = ['-created_at']
         verbose_name_plural = 'Vehicle entries'
+        permissions = [
+            ('manage_trash', 'Pode gerir o lixo de veículos (ver, restaurar, apagar definitivo)'),
+        ]
 
     def __str__(self):
         if self.plate:

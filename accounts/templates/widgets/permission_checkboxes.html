@@ -1,0 +1,25 @@
+{% for group_name, options, group_index in widget.optgroups %}
+<div class="cw-perm-group bg-body-tertiary rounded-3 p-3 mb-2">
+    {% if group_name %}
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="fw-semibold small text-uppercase text-secondary">{{ group_name }}</div>
+        <div class="form-check mb-0">
+            <input class="form-check-input cw-perm-group-all" type="checkbox" id="perm_all_{{ widget.attrs.id }}_{{ group_index }}">
+            <label class="form-check-label small fw-semibold text-navy" for="perm_all_{{ widget.attrs.id }}_{{ group_index }}">Acesso total</label>
+        </div>
+    </div>
+    {% endif %}
+    <div class="row row-cols-1 row-cols-md-2 g-1">
+        {% for option in options %}
+        <div class="col">
+            <div class="form-check">
+                <input type="{{ option.type }}" name="{{ option.name }}" value="{{ option.value }}"
+                       class="form-check-input cw-perm-checkbox" id="{{ option.attrs.id }}"
+                       {% if option.attrs.checked %}checked{% endif %}>
+                <label class="form-check-label small" for="{{ option.attrs.id }}">{{ option.label }}</label>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endfor %}
